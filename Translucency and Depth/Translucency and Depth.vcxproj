@@ -125,6 +125,7 @@
     <None Include="bin\data\shaders\alien.vert" />
     <None Include="bin\data\shaders\alphaTest.frag" />
     <None Include="bin\data\shaders\cloud.frag" />
+    <None Include="bin\data\shaders\spriteSheet.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ProjectExtensions>

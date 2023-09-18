@@ -24,12 +24,15 @@ class ofApp : public ofBaseApp{
 		ofMesh charMesh;
 		ofMesh backgroundMesh;
 		ofMesh cloudMesh;
+		ofMesh sunMesh;
 
 		ofShader charShader;
 		ofShader cloudShader;
+		ofShader animateShader;
 
 		ofImage alienImg;
 		ofImage backgroundImg;
 		ofImage cloudImg;
+		ofImage sunImg;
 
 };
