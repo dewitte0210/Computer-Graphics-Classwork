@@ -32,7 +32,7 @@ glm::mat4 buildViewMatrix(CameraData cam) {
 void ofApp::setup(){
 	ofDisableArbTex();
 	ofEnableDepthTest();
-
+	charPos = glm::vec3(0.0, 0.0, 0.0);
 	alienImg.load("assets/walk_sheet.png");
 	backgroundImg.load("assets/forest.png");
 	cloudImg.load("assets/cloud.png");
@@ -50,7 +50,11 @@ void ofApp::setup(){
 
 //--------------------------------------------------------------
 void ofApp::update(){
-
+	if (walkRight)
+	{
+		float speed = 0.4 * ofGetLastFrameTime();
+		charPos += glm::vec3(speed, 0, 0);
+	}
 }
 
 //--------------------------------------------------------------
@@ -71,22 +75,46 @@ void ofApp::draw(){
 	animateShader.setUniformTexture("tex", alienImg, 0);
 	animateShader.setUniform2f("size", spriteSize);
 	animateShader.setUniform2f("offset", spriteFrame);
+	animateShader.setUniformMatrix4f("view", view);
+	animateShader.setUniformMatrix4f("model", glm::translate(charPos));
 	charMesh.draw();
 	animateShader.end();
 
 	charShader.begin();
+	charShader.setUniformMatrix4f("view", view);
+	charShader.setUniformMatrix4f("model", glm::translate(glm::vec3(0.0, 0.0, 0.0)));
 	charShader.setUniformTexture("tex", backgroundImg, 0);
 	backgroundMesh.draw();	
 	charShader.end();
 
 	ofDisableDepthTest();
 	ofEnableBlendMode(ofBlendMode::OF_BLENDMODE_ADD);
-	cloudShader.begin();	
-	charShader.setUniformTexture("tex", sunImg, 0);
-	sunMesh.draw();
 	
+	cloudShader.begin();
 	ofEnableBlendMode(ofBlendMode::OF_BLENDMODE_ALPHA);
+
+	static float rotation = 0.0f;
+	rotation += 0.1f;
+
+	// construct the transform for our un-rotated cloud
+	glm::mat4 translationA = glm::translate(glm::vec3(-0.55, 0.0, 0.0));
+	glm::mat4 scaleA = glm::scale(glm::vec3(1.5, 1, 1));
+	glm::mat4 transformA = translationA * scaleA;
+
+	//apply a rotation to that
+	glm::mat4 ourRotation = glm::rotate(rotation, glm::vec3(0.0, 0.0, 1.0));
+	glm::mat4 newMatrix = translationA * ourRotation * glm::inverse(translationA);
+	glm::mat4 finalMatrix = newMatrix * transformA;
+
+	glm::mat4 transformB = buildMatrix(glm::vec3(0.4, 0.2, 0.0), 1.0f, glm::vec3(1, 1, 1));
 	cloudShader.setUniformTexture("tex", cloudImg, 1);
+	cloudShader.setUniformMatrix4f("transform", finalMatrix);
+	cloudShader.setUniformMatrix4f("model", finalMatrix);
+	cloudShader.setUniformMatrix4f("view", view);
+	cloudMesh.draw();
+
+	cloudShader.setUniformMatrix4f("transform", transformB);
+	cloudShader.setUniformMatrix4f("model", transformB);
 	cloudMesh.draw();
 	cloudShader.end();
 
@@ -94,12 +122,18 @@ void ofApp::draw(){
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
-
+	if (key == ofKey::OF_KEY_RIGHT)
+	{
+		walkRight = true;
+	}
 }
 
 //--------------------------------------------------------------
 void ofApp::keyReleased(int key){
-
+	if (key == ofKey::OF_KEY_RIGHT)
+	{
+		walkRight = false;
+	}
 }
 
 //--------------------------------------------------------------

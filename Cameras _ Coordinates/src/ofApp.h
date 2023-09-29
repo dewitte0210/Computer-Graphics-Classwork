@@ -42,4 +42,8 @@ class ofApp : public ofBaseApp{
 		ofImage sunImg;
 
 		CameraData cam;
+
+		glm::vec3 charPos;
+
+		bool walkRight = false;
 };
