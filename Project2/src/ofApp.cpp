@@ -2,7 +2,9 @@
 
 //--------------------------------------------------------------
 void ofApp::setup(){
+	ofDisableArbTex();
 
+	meshShader.load("shader/mesh.vert", "shader/mesh.frag");
 }
 
 //--------------------------------------------------------------
@@ -17,7 +19,26 @@ void ofApp::draw(){
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
+	if (key == OF_KEY_UP)
+	{
+		
+	}
+	else if (key == OF_KEY_DOWN)
+	{
 
+	}
+	else if (key == OF_KEY_RIGHT)
+	{
+
+	}
+	else if (key == OF_KEY_LEFT)
+	{
+
+	}
+	else if (key == OF_KEY_RIGHT_CONTROL)
+	{
+
+	}
 }
 
 //--------------------------------------------------------------
