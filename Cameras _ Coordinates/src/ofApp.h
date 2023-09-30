@@ -30,7 +30,6 @@ class ofApp : public ofBaseApp{
 		ofMesh charMesh;
 		ofMesh backgroundMesh;
 		ofMesh cloudMesh;
-		ofMesh sunMesh;
 
 		ofShader charShader;
 		ofShader cloudShader;
@@ -39,11 +38,11 @@ class ofApp : public ofBaseApp{
 		ofImage alienImg;
 		ofImage backgroundImg;
 		ofImage cloudImg;
-		ofImage sunImg;
 
 		CameraData cam;
 
 		glm::vec3 charPos;
 
 		bool walkRight = false;
+		float aspectRatio;
 };
