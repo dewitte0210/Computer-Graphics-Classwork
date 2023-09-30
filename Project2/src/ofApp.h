@@ -1,6 +1,11 @@
 #pragma once
 
 #include "ofMain.h"
+struct CameraData {
+	glm::vec3 pos;
+	float rot;
+	float fov;
+};
 
 class ofApp : public ofBaseApp{
 
@@ -25,4 +30,6 @@ class ofApp : public ofBaseApp{
 		ofMesh staff;
 			
 		ofShader meshShader;
+
+		CameraData cam;
 };
