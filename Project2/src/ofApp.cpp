@@ -4,8 +4,12 @@
 void ofApp::setup(){
 	ofDisableArbTex();
 	ofEnableDepthTest();
+	cam.pos = glm::vec3(0, 0, 1);
+	velocity = glm::vec3(0, 0, 0);
 	staff.load("assets/staff.ply");
 	shapes.load("assets/stackedShapes.ply");
+	staffVbo.setMesh(staff, GL_STATIC_DRAW);
+	shapesVbo.setMesh(shapes, GL_STATIC_DRAW);
 	meshShader.load("shaders/mesh.vert", "shaders/mesh.frag");
 }
 
@@ -18,56 +22,71 @@ void ofApp::update(){
 void ofApp::draw(){
 	using namespace glm;
 
-	cam.pos = vec3(0, 0, 1);
+	
 	cam.fov = radians(100.0f);
 	float aspect = static_cast<float>(ofGetWindowWidth()) / ofGetWindowHeight();
-
+	cam.pos += (velocity * ofGetLastFrameTime());
 
 	meshShader.begin();
 
-	mat4 model{ translate(vec3(0,0,-2)) * rotate(-1.0f, vec3(1.0f,0.0f,0.0f)) * scale(vec3(0.08,0.08,0.08)) };
+	mat4 model{ translate(vec3(0,0,-2)) * rotate(-1.57f, vec3(1.0f,0.0f,0.0f)) * scale(vec3(0.08,0.08,0.08)) };
 	mat4 view{ inverse(translate(cam.pos)) };
 	mat4 projection{perspective(cam.fov, aspect, 0.01f, 10.0f)};
 	mat4 mvp{ projection * view * model };
 
 	meshShader.setUniformMatrix4f("mvp", mvp);
-	staff.draw();
-	
-	model = translate(vec3(-1, 0, -1)) * rotate(-1.0f,vec3(1.0f,0.0f,0.0f)) * scale(vec3(0.25, 0.25, 0.25));
+	staffVbo.drawElements(GL_TRIANGLES, staffVbo.getNumIndices());
+
+	model = translate(vec3(-1, 0, -1)) * rotate(-1.57f,vec3(1.0f,0.0f,0.0f)) * scale(vec3(0.25, 0.25, 0.25));
 	view = inverse(translate(cam.pos));
 	mvp = projection * view * model;
 	meshShader.setUniformMatrix4f("mvp", mvp);
-	shapes.draw();
+	shapesVbo.drawElements(GL_TRIANGLES, shapesVbo.getNumIndices());
 	meshShader.end();
 }
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
-	if (key == OF_KEY_UP)
+	if (key == ' ')
 	{
-		
+		velocity.y = 1;
 	}
-	else if (key == OF_KEY_DOWN)
+	else if (key == OF_KEY_LEFT_CONTROL)
 	{
-
+		velocity.y = -1;
 	}
-	else if (key == OF_KEY_RIGHT)
+	else if (key == 'd')
 	{
-
+		velocity.x = 1;
 	}
-	else if (key == OF_KEY_LEFT)
+	else if (key == 'a')
 	{
-
+		velocity.x = -1;
 	}
-	else if (key == OF_KEY_RIGHT_CONTROL)
+	else if (key == 'w')
 	{
-
+		velocity.z = -1;
+	}
+	else if (key == 's')
+	{
+		velocity.z = 1;
 	}
 }
 
 //--------------------------------------------------------------
 void ofApp::keyReleased(int key){
-
+	if (key == OF_KEY_LEFT_CONTROL || key == ' ')
+	{
+		velocity.y = 0;
+	}
+	else if (key == 'd' || key == 'a')
+	{
+		velocity.x = 0;
+	}
+	else if (key == 'w' || key == 's')
+	{
+		velocity.z = 0;
+	}
 }
 
 //--------------------------------------------------------------

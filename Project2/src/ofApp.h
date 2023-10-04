@@ -30,7 +30,12 @@ class ofApp : public ofBaseApp{
 		ofMesh staff;
 		ofMesh shapes;
 
+		ofVbo staffVbo;
+		ofVbo shapesVbo;
+
 		ofShader meshShader;
 
 		CameraData cam;
+
+		glm::vec3 velocity;
 };
