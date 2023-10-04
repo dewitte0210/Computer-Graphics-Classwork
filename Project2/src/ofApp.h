@@ -28,7 +28,8 @@ class ofApp : public ofBaseApp{
 	
 	private:
 		ofMesh staff;
-			
+		ofMesh shapes;
+
 		ofShader meshShader;
 
 		CameraData cam;

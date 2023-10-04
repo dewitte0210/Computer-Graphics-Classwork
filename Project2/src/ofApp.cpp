@@ -3,7 +3,9 @@
 //--------------------------------------------------------------
 void ofApp::setup(){
 	ofDisableArbTex();
+	ofEnableDepthTest();
 	staff.load("assets/staff.ply");
+	shapes.load("assets/stackedShapes.ply");
 	meshShader.load("shaders/mesh.vert", "shaders/mesh.frag");
 }
 
@@ -20,14 +22,22 @@ void ofApp::draw(){
 	cam.fov = radians(100.0f);
 	float aspect = static_cast<float>(ofGetWindowWidth()) / ofGetWindowHeight();
 
-	mat4 model = mat4() * scale(vec3(0.25,0.25,0.25));
-	mat4 view = inverse(translate(cam.pos));
-	mat4 proj = perspective(cam.fov, aspect, 0.01f, 10.0f);
-	mat4 mvp = proj * view * model;
 
 	meshShader.begin();
+
+	mat4 model{ translate(vec3(0,0,-2)) * rotate(-1.0f, vec3(1.0f,0.0f,0.0f)) * scale(vec3(0.08,0.08,0.08)) };
+	mat4 view{ inverse(translate(cam.pos)) };
+	mat4 projection{perspective(cam.fov, aspect, 0.01f, 10.0f)};
+	mat4 mvp{ projection * view * model };
+
 	meshShader.setUniformMatrix4f("mvp", mvp);
 	staff.draw();
+	
+	model = translate(vec3(-1, 0, -1)) * rotate(-1.0f,vec3(1.0f,0.0f,0.0f)) * scale(vec3(0.25, 0.25, 0.25));
+	view = inverse(translate(cam.pos));
+	mvp = projection * view * model;
+	meshShader.setUniformMatrix4f("mvp", mvp);
+	shapes.draw();
 	meshShader.end();
 }
 
