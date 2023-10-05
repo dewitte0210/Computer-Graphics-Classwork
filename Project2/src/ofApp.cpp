@@ -13,6 +13,9 @@ void ofApp::setup(){
 	meshShader.load("shaders/mesh.vert", "shaders/mesh.frag");
 }
 
+void ofApp::updateCameraRotation(float dx, float dy) {
+	cameraHead += dx * ofGetLastFrameTime();
+}
 //--------------------------------------------------------------
 void ofApp::update(){
 
@@ -29,16 +32,16 @@ void ofApp::draw(){
 
 	meshShader.begin();
 
-	mat4 model{ translate(vec3(0,0,-2)) * rotate(-1.57f, vec3(1.0f,0.0f,0.0f)) * scale(vec3(0.08,0.08,0.08)) };
-	mat4 view{ inverse(translate(cam.pos)) };
+	mat4 model{ translate(vec3(0,0,-2)) * rotate(radians(-90.0f), vec3(1.0f,0.0f,0.0f)) * scale(vec3(0.08,0.08,0.08))};
+	mat4 view{ translate(-cam.pos) * rotate(cameraHead, vec3(0,1,0))};
 	mat4 projection{perspective(cam.fov, aspect, 0.01f, 10.0f)};
 	mat4 mvp{ projection * view * model };
 
 	meshShader.setUniformMatrix4f("mvp", mvp);
 	staffVbo.drawElements(GL_TRIANGLES, staffVbo.getNumIndices());
 
-	model = translate(vec3(-1, 0, -1)) * rotate(-1.57f,vec3(1.0f,0.0f,0.0f)) * scale(vec3(0.25, 0.25, 0.25));
-	view = inverse(translate(cam.pos));
+	model = translate(vec3(-1, 0, -1)) * rotate(radians(-90.0f), vec3(1.0f, 0.0f, 0.0f)) * scale(vec3(0.25, 0.25, 0.25));
+	view = translate(-cam.pos) * rotate(cameraHead, vec3(0,1,0));
 	mvp = projection * view * model;
 	meshShader.setUniformMatrix4f("mvp", mvp);
 	shapesVbo.drawElements(GL_TRIANGLES, shapesVbo.getNumIndices());
@@ -91,7 +94,11 @@ void ofApp::keyReleased(int key){
 
 //--------------------------------------------------------------
 void ofApp::mouseMoved(int x, int y ){
-
+	if (mouseX != 0 && mouseY != 0) {
+		updateCameraRotation(sensitivity * (x - mouseX), sensitivity * (y - mouseY));
+	}
+	mouseX = x;
+	mouseY = y;
 }
 
 //--------------------------------------------------------------
