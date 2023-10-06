@@ -38,10 +38,12 @@ class ofApp : public ofBaseApp{
 		CameraData cam;
 
 		glm::vec3 velocity;
+		int speed{ 4 };
 
 		int mouseX{ 0 };
 		int mouseY{ 0 };
 		float cameraHead{ 0 };
+		float cameraTilt{ 0 };
 		// how many radians correspond to a pixel of mouse movement	
 		float sensitivity{ 0.6 };
 		void updateCameraRotation(float dx, float dy);

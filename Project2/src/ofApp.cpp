@@ -15,6 +15,7 @@ void ofApp::setup(){
 
 void ofApp::updateCameraRotation(float dx, float dy) {
 	cameraHead += dx * ofGetLastFrameTime();
+	cameraTilt += dy * ofGetLastFrameTime();
 }
 //--------------------------------------------------------------
 void ofApp::update(){
@@ -24,28 +25,31 @@ void ofApp::update(){
 //--------------------------------------------------------------
 void ofApp::draw(){
 	using namespace glm;
-
+	std::cout << ofGetFrameRate() << std::endl;
 	
 	cam.fov = radians(100.0f);
 	float aspect = static_cast<float>(ofGetWindowWidth()) / ofGetWindowHeight();
-	cam.pos += (velocity * ofGetLastFrameTime());
-
+	cam.pos += (velocity * speed * ofGetLastFrameTime());
+	// With Vbo avg fps is 11, without Vbo avg fps is 5.7
 	meshShader.begin();
+	for (int i = 0; i < 5000; i++) {
+		mat4 model{ translate(vec3(0,0,-2)) * rotate(radians(-90.0f), vec3(1.0f,0.0f,0.0f)) * scale(vec3(0.08,0.08,0.08))};
+		mat4 view{ translate(-cam.pos) * rotate(cameraHead, vec3(0,1,0)) * rotate(cameraTilt,vec3(1,0,0)) };
+		mat4 projection{ perspective(cam.fov, aspect, 0.01f, 10.0f) };
+		mat4 mvp{ projection * view * model };
 
-	mat4 model{ translate(vec3(0,0,-2)) * rotate(radians(-90.0f), vec3(1.0f,0.0f,0.0f)) * scale(vec3(0.08,0.08,0.08))};
-	mat4 view{ translate(-cam.pos) * rotate(cameraHead, vec3(0,1,0))};
-	mat4 projection{perspective(cam.fov, aspect, 0.01f, 10.0f)};
-	mat4 mvp{ projection * view * model };
+		meshShader.setUniformMatrix4f("mvp", mvp);
+		staffVbo.drawElements(GL_TRIANGLES, staffVbo.getNumIndices());
+	//	staff.draw();
 
-	meshShader.setUniformMatrix4f("mvp", mvp);
-	staffVbo.drawElements(GL_TRIANGLES, staffVbo.getNumIndices());
-
-	model = translate(vec3(-1, 0, -1)) * rotate(radians(-90.0f), vec3(1.0f, 0.0f, 0.0f)) * scale(vec3(0.25, 0.25, 0.25));
-	view = translate(-cam.pos) * rotate(cameraHead, vec3(0,1,0));
-	mvp = projection * view * model;
-	meshShader.setUniformMatrix4f("mvp", mvp);
-	shapesVbo.drawElements(GL_TRIANGLES, shapesVbo.getNumIndices());
-	meshShader.end();
+		model = translate(vec3(-1, 0, -1)) * rotate(radians(-90.0f), vec3(1.0f, 0.0f, 0.0f)) * scale(vec3(0.25, 0.25, 0.25));
+		view = translate(-cam.pos) * rotate(cameraHead, vec3(0, 1, 0)) * rotate(cameraTilt, vec3(1, 0, 0));
+		mvp = projection * view * model;
+		meshShader.setUniformMatrix4f("mvp", mvp);
+		shapesVbo.drawElements(GL_TRIANGLES, shapesVbo.getNumIndices());
+	//	shapes.draw();
+		meshShader.end();
+	}
 }
 
 //--------------------------------------------------------------
