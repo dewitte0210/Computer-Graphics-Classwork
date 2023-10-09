@@ -43,12 +43,14 @@ void ofApp::draw(){
 
 		meshShader.setUniformMatrix4f("mvp", mvp);
 		meshShader.setUniformMatrix4f("modelView", modelView);
+		meshShader.setUniformMatrix3f("model", model);
 		staffVbo.drawElements(GL_TRIANGLES, staffVbo.getNumIndices());
 		//staff.draw();
 
 		model = translate(vec3(-1, 0, -1)) * rotate(radians(-90.0f), vec3(1.0f, 0.0f, 0.0f)) * scale(vec3(0.25, 0.25, 0.25));
 		mvp = projection * view * model;
 		meshShader.setUniformMatrix4f("mvp", mvp);
+		meshShader.setUniformMatrix3f("model", model);
 		shapesVbo.drawElements(GL_TRIANGLES, shapesVbo.getNumIndices());
 	//	shapes.draw();
 	}
