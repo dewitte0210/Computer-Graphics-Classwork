@@ -38,6 +38,7 @@ class ofApp : public ofBaseApp{
 		CameraData cam;
 
 		glm::vec3 velocity;
+		glm::vec3 velocityWorldSpace;
 		int speed{ 4 };
 
 		int mouseX{ 0 };

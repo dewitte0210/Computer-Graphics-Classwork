@@ -4,6 +4,7 @@
 void ofApp::setup(){
 	ofDisableArbTex();
 	ofEnableDepthTest();
+	glEnable(GL_CULL_FACE);
 	cam.pos = glm::vec3(0, 0, 1);
 	velocity = glm::vec3(0, 0, 0);
 	staff.load("assets/staff.ply");
@@ -19,7 +20,7 @@ void ofApp::updateCameraRotation(float dx, float dy) {
 }
 //--------------------------------------------------------------
 void ofApp::update(){
-
+	velocityWorldSpace = glm::mat3(glm::rotate(-cameraHead, glm::vec3(0, 1, 0))) * velocity * ofGetLastFrameTime();
 }
 
 //--------------------------------------------------------------
@@ -29,19 +30,21 @@ void ofApp::draw(){
 	
 	cam.fov = radians(100.0f);
 	float aspect = static_cast<float>(ofGetWindowWidth()) / ofGetWindowHeight();
-	cam.pos += (velocity * speed * ofGetLastFrameTime());
+	cam.pos += velocityWorldSpace * speed;
 
-	// With Vbo avg fps is 11, without Vbo avg fps is 5.7
+	// With Vbo avg fps is 47, without Vbo avg fps is 28
 	meshShader.begin();
 	for (int i = 0; i < 1000; i++) {
 		mat4 model{ translate(vec3(0,0,-2)) * rotate(radians(-90.0f), vec3(1.0f,0.0f,0.0f)) * scale(vec3(0.08,0.08,0.08))};
-		mat4 view{ rotate(cameraHead, vec3(0,1,0)) * rotate(cameraTilt,vec3(1,0,0))* translate(-cam.pos)};
+		mat4 view{rotate(cameraTilt,vec3(1,0,0)) * rotate(cameraHead, vec3(0,1,0)) * translate(-cam.pos)};
 		mat4 projection{ perspective(cam.fov, aspect, 0.01f, 10.0f) };
+		mat4 modelView{ view * model };
 		mat4 mvp{ projection * view * model };
 
 		meshShader.setUniformMatrix4f("mvp", mvp);
+		meshShader.setUniformMatrix4f("modelView", modelView);
 		staffVbo.drawElements(GL_TRIANGLES, staffVbo.getNumIndices());
-	//	staff.draw();
+		//staff.draw();
 
 		model = translate(vec3(-1, 0, -1)) * rotate(radians(-90.0f), vec3(1.0f, 0.0f, 0.0f)) * scale(vec3(0.25, 0.25, 0.25));
 		mvp = projection * view * model;
