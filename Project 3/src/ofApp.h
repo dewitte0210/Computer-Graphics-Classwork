@@ -29,7 +29,7 @@ private:
 
 	ofVboMesh terrain;
 	
-	ofShortPixels heightmap;
+	ofShortImage heightmap;
 
 	CameraData cam;
 	glm::vec3 velocity;

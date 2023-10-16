@@ -11,6 +11,12 @@ void ofApp::setup(){
 	glEnable(GL_CULL_FACE);
 	cam.pos = glm::vec3(0, 0, 1);
 	velocity = glm::vec3(0, 0, 0);
+	heightmap.setUseTexture(false);
+	heightmap.load("assets/TamrielLowRes.png");
+	assert(heightmap.getWidth() != 0 && heightmap.getHeight() != 0);
+	buildTerrainMesh(terrain, heightmap, 0, 0, heightmap.getWidth() - 1, heightmap.getHeight() - 1, glm::vec3(1, 50, 1));
+	terrain.flatNormals();
+	terrainShader.load("shaders/terrain.vert", "shaders/terrain.frag");
 }
 
 //--------------------------------------------------------------
@@ -21,16 +27,21 @@ void ofApp::update(){
 //--------------------------------------------------------------
 void ofApp::draw(){
 	using namespace glm;
-	std::cout << ofGetFrameRate() << std::endl;
 
 	cam.fov = radians(100.0f);
 	float aspect = static_cast<float>(ofGetWindowWidth()) / ofGetWindowHeight();
 	cam.pos += velocityWorldSpace * speed;
 
-	mat4 view{ rotate(cameraTilt, vec3(1,0,0)) * rotate(cameraHead, vec3(0,1,0)) * translate(-cam.pos) };
-	mat4 projection{ perspective(radians(100.0f), aspect, 0.01f, 10.0f) };
+	mat4 view{ rotate(cameraTilt, vec3(1,0,0)) * rotate(cameraHead, vec3(0,1,0)) * translate(-cam.pos)};
+	mat4 projection{ perspective(radians(100.0f), aspect, 0.01f, 50.0f)};
 
 	terrainShader.begin();
+	mat4 model{ translate(vec3(0,-20,0))};
+	mat4 mvp = projection * view * model;
+	terrainShader.setUniformMatrix4f("mvp", mvp);
+	terrainShader.setUniformMatrix4f("model", model);
+	terrainShader.setUniformMatrix4f("modelView", view * model);
+	terrain.draw();
 	terrainShader.end();
 }
 
