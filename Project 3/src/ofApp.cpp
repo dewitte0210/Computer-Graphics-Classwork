@@ -14,8 +14,10 @@ void ofApp::setup(){
 	heightmap.setUseTexture(false);
 	heightmap.load("assets/TamrielLowRes.png");
 	assert(heightmap.getWidth() != 0 && heightmap.getHeight() != 0);
+
 	buildTerrainMesh(terrain, heightmap, 0, 0, heightmap.getWidth() - 1, heightmap.getHeight() - 1, glm::vec3(1, 50, 1));
 	terrain.flatNormals();
+
 	terrainShader.load("shaders/terrain.vert", "shaders/terrain.frag");
 }
 
@@ -36,10 +38,10 @@ void ofApp::draw(){
 	mat4 projection{ perspective(radians(100.0f), aspect, 0.01f, 50.0f)};
 
 	terrainShader.begin();
-	mat4 model{ translate(vec3(0,-20,0))};
+	mat4 model{ mat4() * translate(vec3(0,-20,0)) };
 	mat4 mvp = projection * view * model;
 	terrainShader.setUniformMatrix4f("mvp", mvp);
-	terrainShader.setUniformMatrix4f("model", model);
+	terrainShader.setUniformMatrix3f("normalMatrix", model);
 	terrainShader.setUniformMatrix4f("modelView", view * model);
 	terrain.draw();
 	terrainShader.end();
@@ -71,6 +73,10 @@ void ofApp::keyPressed(int key){
 	{
 		velocity.z = 1;
 	}
+	else if (key == OF_KEY_LEFT_SHIFT)
+	{
+		speed = 30;
+	}
 }
 
 //--------------------------------------------------------------
@@ -86,6 +92,10 @@ void ofApp::keyReleased(int key){
 	else if (key == 'w' || key == 's')
 	{
 		velocity.z = 0;
+	}
+	else if (key == OF_KEY_LEFT_SHIFT)
+	{
+		speed = 10;
 	}
 }
 

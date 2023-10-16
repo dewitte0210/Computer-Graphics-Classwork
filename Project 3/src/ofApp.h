@@ -34,7 +34,8 @@ private:
 	CameraData cam;
 	glm::vec3 velocity;
 	glm::vec3 velocityWorldSpace;
-	int speed{ 4 };
+	int speed{ 10 };
+
 	int mouseX{ 0 };
 	int mouseY{ 0 };
 	float cameraHead{ 0 };
