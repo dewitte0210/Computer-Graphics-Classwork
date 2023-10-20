@@ -1,10 +1,17 @@
 #version 410
 
+uniform vec3 lightDirection;
+uniform vec3 lightColor;
+uniform vec3 meshColor;
+
 in vec3 fragNormal;
 in vec3 cameraSpacePos;
 out vec4 outColor;
 
 void main(){
-	//double alpha =  smoothstep(0.0, 10.0, sqrt(pow(cameraSpacePos.x,2) + pow(cameraSpacePos.y,2) + pow(cameraSpacePos.z,2)));	
-	outColor = vec4(normalize(fragNormal), 1.0);
+	vec3 normal = normalize(fragNormal);	
+	float nDotL = max(0, dot(normal, lightDirection)); //calculate light intensty Cos(Theta)
+	vec3 irradiance = lightColor * nDotL; // How much light the surface recieves
+		
+	outColor = vec4(pow(meshColor * irradiance, vec3(1.0/2.2)), 1.0);
 }

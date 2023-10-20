@@ -10,7 +10,9 @@ void buildTerrainMesh(ofMesh& terrainMesh, const ofShortPixels& heightmap,
 			terrainMesh.addVertex(glm::vec3(x, static_cast<float>(height) / USHRT_MAX, y) * scale);
 		}
 	}
-	int width = xEnd + 1;
+
+
+	int width = (xEnd - xStart) + 1;
 	// Index Buffer
 	for (int y = xStart; y < yEnd; y++) {
 		for (int x = xStart; x < xEnd; x++) {

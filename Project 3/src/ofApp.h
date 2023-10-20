@@ -1,10 +1,15 @@
 #pragma once
 
 #include "ofMain.h"
+#include "CellManager.h"
 struct CameraData {
 	glm::vec3 pos;
 	float rot;
 	float fov;
+};
+struct pointLight {
+	glm::vec3 direction;
+	glm::vec3 lightColor;
 };
 class ofApp : public ofBaseApp{
 
@@ -12,7 +17,7 @@ class ofApp : public ofBaseApp{
 		void setup();
 		void update();
 		void draw();
-
+		void exit();
 		void keyPressed(int key);
 		void keyReleased(int key);
 		void mouseMoved(int x, int y );
@@ -26,16 +31,18 @@ class ofApp : public ofBaseApp{
 		void gotMessage(ofMessage msg);
 private:
 	ofShader terrainShader;
-
 	ofVboMesh terrain;
-	
 	ofShortImage heightmap;
+	ofShortImage highResHeightmap;
+
+	CellManager<5> cellManager{ highResHeightmap, 1600, 256 };
+	pointLight mainLight;
 
 	CameraData cam;
 	glm::vec3 velocity;
 	glm::vec3 velocityWorldSpace;
-	int speed{ 10 };
-
+	int speed{ 320 };
+	
 	int mouseX{ 0 };
 	int mouseY{ 0 };
 	float cameraHead{ 0 };

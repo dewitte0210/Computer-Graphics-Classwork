@@ -9,21 +9,31 @@ void ofApp::setup(){
 	ofDisableArbTex();
 	ofEnableDepthTest();
 	glEnable(GL_CULL_FACE);
-	cam.pos = glm::vec3(0, 0, 1);
 	velocity = glm::vec3(0, 0, 0);
+	mainLight.direction = glm::vec3(-1, 1, 1);
+	mainLight.lightColor = glm::vec3(1);
+
 	heightmap.setUseTexture(false);
 	heightmap.load("assets/TamrielLowRes.png");
 	assert(heightmap.getWidth() != 0 && heightmap.getHeight() != 0);
 
-	buildTerrainMesh(terrain, heightmap, 0, 0, heightmap.getWidth() - 1, heightmap.getHeight() - 1, glm::vec3(1, 50, 1));
+	highResHeightmap.setUseTexture(false);
+	highResHeightmap.load("assets/TamrielHighRes.png");
+	assert(highResHeightmap.getWidth() != 0 && highResHeightmap.getHeight() != 0);
+	
+	float scale{ highResHeightmap.getWidth() / heightmap.getWidth() };
+	buildTerrainMesh(terrain, heightmap, 0, 0, heightmap.getWidth() - 1, heightmap.getHeight() - 1, glm::vec3(scale, 50 * scale, scale));
 	terrain.flatNormals();
-
+	
+	cam.pos = glm::vec3((highResHeightmap.getWidth() - 1) * 0.5f, 720, (highResHeightmap.getHeight() - 1) * 0.5f);
+	cellManager.initializeForPosition(cam.pos);
 	terrainShader.load("shaders/terrain.vert", "shaders/terrain.frag");
 }
 
 //--------------------------------------------------------------
 void ofApp::update(){
 	velocityWorldSpace = glm::mat3(glm::rotate(-cameraHead, glm::vec3(0, 1, 0))) * velocity * ofGetLastFrameTime();
+	cellManager.optimizeForPosition(cam.pos);
 }
 
 //--------------------------------------------------------------
@@ -35,15 +45,26 @@ void ofApp::draw(){
 	cam.pos += velocityWorldSpace * speed;
 
 	mat4 view{ rotate(cameraTilt, vec3(1,0,0)) * rotate(cameraHead, vec3(0,1,0)) * translate(-cam.pos)};
-	mat4 projection{ perspective(radians(100.0f), aspect, 0.01f, 50.0f)};
 
 	terrainShader.begin();
-	mat4 model{ mat4() * translate(vec3(0,-20,0)) };
+	//draw low LOD terrain in the background	
+	mat4 projection{ perspective(radians(100.0f), aspect, 1000.0f, 10000.0f)};
+	mat4 model{ mat4() * translate(vec3(0,-800,0)) };
 	mat4 mvp = projection * view * model;
+	terrainShader.setUniform3f("meshColor", vec3(0.2, 1, 0.4));
+	terrainShader.setUniform3f("lightDirection", mainLight.direction);
+	terrainShader.setUniform3f("lightColor", normalize(mainLight.lightColor));
 	terrainShader.setUniformMatrix4f("mvp", mvp);
 	terrainShader.setUniformMatrix3f("normalMatrix", model);
 	terrainShader.setUniformMatrix4f("modelView", view * model);
 	terrain.draw();
+
+	//switch to high LOD for closer terrain
+	glClear(GL_DEPTH_BUFFER_BIT);
+	projection = perspective(radians(100.0f), aspect, 0.01f, 1000.0f);
+	mvp = projection * view * model;
+	terrainShader.setUniformMatrix4f("mvp", mvp);
+	cellManager.drawActiveCells(cam.pos, 1000.0f);
 	terrainShader.end();
 }
 
@@ -75,7 +96,7 @@ void ofApp::keyPressed(int key){
 	}
 	else if (key == OF_KEY_LEFT_SHIFT)
 	{
-		speed = 30;
+		speed = 960;
 	}
 }
 
@@ -95,7 +116,7 @@ void ofApp::keyReleased(int key){
 	}
 	else if (key == OF_KEY_LEFT_SHIFT)
 	{
-		speed = 10;
+		speed = 320;
 	}
 }
 
@@ -108,6 +129,9 @@ void ofApp::mouseMoved(int x, int y ){
 	mouseY = y;
 }
 
+void ofApp::exit() {
+	cellManager.stop();
+}
 //--------------------------------------------------------------
 void ofApp::mouseDragged(int x, int y, int button){
 
