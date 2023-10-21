@@ -14,7 +14,7 @@ void buildTerrainMesh(ofMesh& terrainMesh, const ofShortPixels& heightmap,
 
 	int width = (xEnd - xStart) + 1;
 	// Index Buffer
-	for (int y = xStart; y < yEnd; y++) {
+	for (int y = yStart; y < yEnd; y++) {
 		for (int x = xStart; x < xEnd; x++) {
 			int a = x + y * width;
 			int b = (x + 1) + y * width;
