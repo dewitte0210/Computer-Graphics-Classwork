@@ -3,6 +3,8 @@
 void buildTerrainMesh(ofMesh& terrainMesh, const ofShortPixels& heightmap,
 	unsigned int xStart, unsigned int yStart, unsigned int xEnd, unsigned int yEnd, glm::vec3 scale) {
 	
+	terrainMesh.clear();
+
 	//Create verticies
 	for (int y = yStart; y <= yEnd; y++) {
 		for (int x = xStart; x <= xEnd; x++) {
@@ -13,10 +15,10 @@ void buildTerrainMesh(ofMesh& terrainMesh, const ofShortPixels& heightmap,
 
 
 	int width = (xEnd - xStart) + 1;
-	
+	int height = (yEnd - yStart) + 1;
 	// Index Buffer
-	for (int y = yStart; y < yEnd; y++) {
-		for (int x = xStart; x < xEnd; x++) {
+	for (int y = 0; y < height -1; y++) {
+		for (int x = 0; x < width -1; x++) {
 			int a = x + y * width;
 			int b = (x + 1) + y * width;
 			int c = x + (y + 1) * width;
@@ -31,4 +33,5 @@ void buildTerrainMesh(ofMesh& terrainMesh, const ofShortPixels& heightmap,
 			terrainMesh.addIndex(d);
 		}
 	}
+	terrainMesh.flatNormals();
 }

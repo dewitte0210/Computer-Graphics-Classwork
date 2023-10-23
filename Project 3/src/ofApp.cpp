@@ -20,11 +20,18 @@ void ofApp::setup(){
 	highResHeightmap.setUseTexture(false);
 	highResHeightmap.load("assets/TamrielHighRes.png");
 	assert(highResHeightmap.getWidth() != 0 && highResHeightmap.getHeight() != 0);
+
+	//Create Watter Plane
+	water.addVertex(glm::vec3(0, 700, 0));
+	water.addVertex(glm::vec3(heightmap.getWidth(), 700, 0));
+	water.addVertex(glm::vec3(0, 700, heightmap.getHeight()));
+	water.addVertex(glm::vec3(heightmap.getWidth(), 700, heightmap.getHeight()));
+	ofIndexType indicies[6] = { 0,3,2,1,3,0};
+	water.addIndices(indicies, 6);
+	water.flatNormals();
 	
 	float scale{ (highResHeightmap.getWidth() - 1) / (heightmap.getWidth() - 1) };
 	buildTerrainMesh(terrain, heightmap, 0, 0, heightmap.getWidth() - 1, heightmap.getHeight() - 1, glm::vec3(scale, 50 * scale, scale));
-	terrain.flatNormals();
-	
 	cam.pos = glm::vec3((highResHeightmap.getWidth() - 1) * 0.5f, 720, (highResHeightmap.getHeight() - 1) * 0.5f);
 	cellManager.initializeForPosition(cam.pos);
 	terrainShader.load("shaders/terrain.vert", "shaders/terrain.frag");
@@ -48,8 +55,8 @@ void ofApp::draw(){
 
 	terrainShader.begin();
 	//draw low LOD terrain in the background	
-	mat4 projection{ perspective(radians(100.0f), aspect, 1000.0f, 10000.0f)};
-	mat4 model{ mat4() * translate(vec3(0,-800,0)) };
+	mat4 projection{ perspective(radians(100.0f), aspect, 0.1f, 10000.0f)};
+	mat4 model{ mat4()};
 	mat4 mvp = projection * view * model;
 	terrainShader.setUniform3f("meshColor", vec3(0.2, 1, 0.4));
 	terrainShader.setUniform3f("lightDirection", mainLight.direction);
@@ -59,12 +66,17 @@ void ofApp::draw(){
 	terrainShader.setUniformMatrix4f("modelView", view * model);
 	terrain.draw();
 
+	terrainShader.setUniform3f("meshColor", vec3(0.1, 0.1, 1));
+	water.draw();
+	terrainShader.setUniform3f("meshColor", vec3(0.2, 1, 0.4));
 	//switch to high LOD for closer terrain
 	glClear(GL_DEPTH_BUFFER_BIT);
-	projection = perspective(radians(100.0f), aspect, 0.01f, 1000.0f);
+//	projection = perspective(radians(100.0f), aspect, 0.01f, 400.0f);
 	mvp = projection * view * model;
 	terrainShader.setUniformMatrix4f("mvp", mvp);
 	cellManager.drawActiveCells(cam.pos, 1000.0f);
+	terrainShader.setUniform3f("meshColor", vec3(0.1, 0.1, 1));
+	water.draw();
 	terrainShader.end();
 }
 

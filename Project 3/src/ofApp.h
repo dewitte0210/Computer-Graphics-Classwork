@@ -32,6 +32,7 @@ class ofApp : public ofBaseApp{
 private:
 	ofShader terrainShader;
 	ofVboMesh terrain;
+	ofVboMesh water;
 	ofShortImage heightmap;
 	ofShortImage highResHeightmap;
 
