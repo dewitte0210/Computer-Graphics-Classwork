@@ -12,6 +12,5 @@ out vec3 cameraSpacePos;
 void main(){
 	gl_Position = mvp * vec4(pos, 1.0);
 	fragNormal = normalMatrix * (normal * -1);
-//	fragNormal = normal * -1;
 	cameraSpacePos = vec3(modelView * vec4(1,1,1,1));
 }

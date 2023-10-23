@@ -21,7 +21,7 @@ void ofApp::setup(){
 	highResHeightmap.load("assets/TamrielHighRes.png");
 	assert(highResHeightmap.getWidth() != 0 && highResHeightmap.getHeight() != 0);
 	
-	float scale{ highResHeightmap.getWidth() / heightmap.getWidth() };
+	float scale{ (highResHeightmap.getWidth() - 1) / (heightmap.getWidth() - 1) };
 	buildTerrainMesh(terrain, heightmap, 0, 0, heightmap.getWidth() - 1, heightmap.getHeight() - 1, glm::vec3(scale, 50 * scale, scale));
 	terrain.flatNormals();
 	
