@@ -21,18 +21,18 @@ void ofApp::setup(){
 	highResHeightmap.load("assets/TamrielHighRes.png");
 	assert(highResHeightmap.getWidth() != 0 && highResHeightmap.getHeight() != 0);
 
-	//Create Watter Plane
+	//Create Water Plane
 	water.addVertex(glm::vec3(0, 700, 0));
-	water.addVertex(glm::vec3(heightmap.getWidth(), 700, 0));
-	water.addVertex(glm::vec3(0, 700, heightmap.getHeight()));
-	water.addVertex(glm::vec3(heightmap.getWidth(), 700, heightmap.getHeight()));
-	ofIndexType indicies[6] = { 0,3,2,1,3,0};
+	water.addVertex(glm::vec3(highResHeightmap.getWidth(), 700, 0));
+	water.addVertex(glm::vec3(0, 700, highResHeightmap.getHeight()));
+	water.addVertex(glm::vec3(highResHeightmap.getWidth(), 700, highResHeightmap.getHeight()));
+	ofIndexType indicies[6] = { 0,2,3,1,0,3};
 	water.addIndices(indicies, 6);
 	water.flatNormals();
 	
 	float scale{ (highResHeightmap.getWidth() - 1) / (heightmap.getWidth() - 1) };
 	buildTerrainMesh(terrain, heightmap, 0, 0, heightmap.getWidth() - 1, heightmap.getHeight() - 1, glm::vec3(scale, 50 * scale, scale));
-	cam.pos = glm::vec3((highResHeightmap.getWidth() - 1) * 0.5f, 720, (highResHeightmap.getHeight() - 1) * 0.5f);
+	cam.pos = glm::vec3((highResHeightmap.getWidth() - 1) * 0.5f, 820, (highResHeightmap.getHeight() - 1) * 0.5f);
 	cellManager.initializeForPosition(cam.pos);
 	terrainShader.load("shaders/terrain.vert", "shaders/terrain.frag");
 }
@@ -53,29 +53,31 @@ void ofApp::draw(){
 
 	mat4 view{ rotate(cameraTilt, vec3(1,0,0)) * rotate(cameraHead, vec3(0,1,0)) * translate(-cam.pos)};
 
-	terrainShader.begin();
 	//draw low LOD terrain in the background	
-	mat4 projection{ perspective(radians(100.0f), aspect, 0.1f, 10000.0f)};
+	mat4 projection{ perspective(radians(90.0f), aspect, 450.0f, 10000.0f)};
 	mat4 model{ mat4()};
 	mat4 mvp = projection * view * model;
+
+	terrainShader.begin();
 	terrainShader.setUniform3f("meshColor", vec3(0.2, 1, 0.4));
 	terrainShader.setUniform3f("lightDirection", mainLight.direction);
 	terrainShader.setUniform3f("lightColor", normalize(mainLight.lightColor));
+	terrainShader.setUniform3f("ambientLight", vec3(0.1));
 	terrainShader.setUniformMatrix4f("mvp", mvp);
 	terrainShader.setUniformMatrix3f("normalMatrix", model);
 	terrainShader.setUniformMatrix4f("modelView", view * model);
 	terrain.draw();
-
-	terrainShader.setUniform3f("meshColor", vec3(0.1, 0.1, 1));
+	
+	terrainShader.setUniform3f("meshColor", vec3(0.1, 0.4, 0.8));
 	water.draw();
 	terrainShader.setUniform3f("meshColor", vec3(0.2, 1, 0.4));
 	//switch to high LOD for closer terrain
 	glClear(GL_DEPTH_BUFFER_BIT);
-//	projection = perspective(radians(100.0f), aspect, 0.01f, 400.0f);
+    projection = perspective(radians(90.0f), aspect, 0.01f, 500.0f);
 	mvp = projection * view * model;
 	terrainShader.setUniformMatrix4f("mvp", mvp);
 	cellManager.drawActiveCells(cam.pos, 1000.0f);
-	terrainShader.setUniform3f("meshColor", vec3(0.1, 0.1, 1));
+	terrainShader.setUniform3f("meshColor", vec3(0.1, 0.4, 0.8));
 	water.draw();
 	terrainShader.end();
 }
@@ -108,7 +110,7 @@ void ofApp::keyPressed(int key){
 	}
 	else if (key == OF_KEY_LEFT_SHIFT)
 	{
-		speed = 960;
+		speed = 750;
 	}
 }
 
@@ -128,7 +130,7 @@ void ofApp::keyReleased(int key){
 	}
 	else if (key == OF_KEY_LEFT_SHIFT)
 	{
-		speed = 320;
+		speed = 250;
 	}
 }
 
