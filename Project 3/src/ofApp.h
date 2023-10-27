@@ -32,6 +32,8 @@ class ofApp : public ofBaseApp{
 private:
 	ofShader terrainShader;
 	ofVboMesh terrain;
+	glm::vec3 terrainColor{ 0.2, 1,0.4 };
+	glm::vec3 waterColor{ 0.1,0.4,0.8 };
 	ofVboMesh water;
 	ofShortImage heightmap;
 	ofShortImage highResHeightmap;
@@ -42,7 +44,7 @@ private:
 	CameraData cam;
 	glm::vec3 velocity;
 	glm::vec3 velocityWorldSpace;
-	int speed{ 250 };
+	int speed{ 150 };
 	int mouseX{ 0 };
 	int mouseY{ 0 };
 	float cameraHead{ 0 };

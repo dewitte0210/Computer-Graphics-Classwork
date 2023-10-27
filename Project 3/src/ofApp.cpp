@@ -8,6 +8,7 @@ void ofApp::updateCameraRotation(float dx, float dy) {
 void ofApp::setup(){
 	ofDisableArbTex();
 	ofEnableDepthTest();
+	ofSetBackgroundColor(53,81,92);
 	glEnable(GL_CULL_FACE);
 	velocity = glm::vec3(0, 0, 0);
 	mainLight.direction = glm::vec3(-1, 1, 1);
@@ -47,6 +48,7 @@ void ofApp::update(){
 void ofApp::draw(){
 	using namespace glm;
 
+	ofEnableBlendMode(OF_BLENDMODE_ALPHA);
 	cam.fov = radians(100.0f);
 	float aspect = static_cast<float>(ofGetWindowWidth()) / ofGetWindowHeight();
 	cam.pos += velocityWorldSpace * speed;
@@ -54,12 +56,12 @@ void ofApp::draw(){
 	mat4 view{ rotate(cameraTilt, vec3(1,0,0)) * rotate(cameraHead, vec3(0,1,0)) * translate(-cam.pos)};
 
 	//draw low LOD terrain in the background	
-	mat4 projection{ perspective(radians(90.0f), aspect, 450.0f, 10000.0f)};
+	mat4 projection{ perspective(radians(90.0f), aspect, 460.0f, 1300.0f)};
 	mat4 model{ mat4()};
-	mat4 mvp = projection * view * model;
+	mat4 mvp{ projection * view * model };
 
 	terrainShader.begin();
-	terrainShader.setUniform3f("meshColor", vec3(0.2, 1, 0.4));
+	terrainShader.setUniform3f("meshColor", terrainColor);
 	terrainShader.setUniform3f("lightDirection", mainLight.direction);
 	terrainShader.setUniform3f("lightColor", normalize(mainLight.lightColor));
 	terrainShader.setUniform3f("ambientLight", vec3(0.1));
@@ -68,16 +70,17 @@ void ofApp::draw(){
 	terrainShader.setUniformMatrix4f("modelView", view * model);
 	terrain.draw();
 	
-	terrainShader.setUniform3f("meshColor", vec3(0.1, 0.4, 0.8));
+	terrainShader.setUniform3f("meshColor", waterColor);
 	water.draw();
-	terrainShader.setUniform3f("meshColor", vec3(0.2, 1, 0.4));
+	terrainShader.setUniform3f("meshColor", terrainColor);
+
 	//switch to high LOD for closer terrain
 	glClear(GL_DEPTH_BUFFER_BIT);
     projection = perspective(radians(90.0f), aspect, 0.01f, 500.0f);
 	mvp = projection * view * model;
 	terrainShader.setUniformMatrix4f("mvp", mvp);
 	cellManager.drawActiveCells(cam.pos, 1000.0f);
-	terrainShader.setUniform3f("meshColor", vec3(0.1, 0.4, 0.8));
+	terrainShader.setUniform3f("meshColor", waterColor);
 	water.draw();
 	terrainShader.end();
 }
@@ -110,7 +113,7 @@ void ofApp::keyPressed(int key){
 	}
 	else if (key == OF_KEY_LEFT_SHIFT)
 	{
-		speed = 750;
+		speed = 500;
 	}
 }
 
@@ -130,7 +133,7 @@ void ofApp::keyReleased(int key){
 	}
 	else if (key == OF_KEY_LEFT_SHIFT)
 	{
-		speed = 250;
+		speed = 150;
 	}
 }
 
