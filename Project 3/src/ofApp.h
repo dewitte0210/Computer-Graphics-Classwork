@@ -32,8 +32,8 @@ class ofApp : public ofBaseApp{
 private:
 	ofShader terrainShader;
 	ofVboMesh terrain;
-	glm::vec3 terrainColor{ 0.2, 1,0.4 };
-	glm::vec3 waterColor{ 0.1,0.4,0.8 };
+	const glm::vec3 TERRAIN_COLOR{ 0.2, 1,0.4 };
+	const glm::vec3 WATER_COLOR{ 0.1,0.4,0.8 };
 	ofVboMesh water;
 	ofShortImage heightmap;
 	ofShortImage highResHeightmap;

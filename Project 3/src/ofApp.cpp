@@ -55,13 +55,15 @@ void ofApp::draw(){
 
 	mat4 view{ rotate(cameraTilt, vec3(1,0,0)) * rotate(cameraHead, vec3(0,1,0)) * translate(-cam.pos)};
 
-	//draw low LOD terrain in the background	
-	mat4 projection{ perspective(radians(90.0f), aspect, 460.0f, 1300.0f)};
+	//draw low LOD terrain in the background
+	mat4 projection{ perspective(radians(90.0f), aspect, 450.0f, 2000.0f)};
 	mat4 model{ mat4()};
 	mat4 mvp{ projection * view * model };
-
+	
 	terrainShader.begin();
-	terrainShader.setUniform3f("meshColor", terrainColor);
+	terrainShader.setUniform1f("fogStart", 500.0f);
+	terrainShader.setUniform1f("fogEnd", 2000.0f);
+	terrainShader.setUniform3f("meshColor", TERRAIN_COLOR);
 	terrainShader.setUniform3f("lightDirection", mainLight.direction);
 	terrainShader.setUniform3f("lightColor", normalize(mainLight.lightColor));
 	terrainShader.setUniform3f("ambientLight", vec3(0.1));
@@ -70,17 +72,19 @@ void ofApp::draw(){
 	terrainShader.setUniformMatrix4f("modelView", view * model);
 	terrain.draw();
 	
-	terrainShader.setUniform3f("meshColor", waterColor);
+	terrainShader.setUniform3f("meshColor", WATER_COLOR);
 	water.draw();
-	terrainShader.setUniform3f("meshColor", terrainColor);
+	terrainShader.setUniform3f("meshColor", TERRAIN_COLOR);
 
 	//switch to high LOD for closer terrain
 	glClear(GL_DEPTH_BUFFER_BIT);
     projection = perspective(radians(90.0f), aspect, 0.01f, 500.0f);
 	mvp = projection * view * model;
 	terrainShader.setUniformMatrix4f("mvp", mvp);
+	terrainShader.setUniform1f("fogStart", 450.0f);
+	terrainShader.setUniform1f("fogEnd", 500.0f);
 	cellManager.drawActiveCells(cam.pos, 1000.0f);
-	terrainShader.setUniform3f("meshColor", waterColor);
+	terrainShader.setUniform3f("meshColor", WATER_COLOR);
 	water.draw();
 	terrainShader.end();
 }
