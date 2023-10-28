@@ -56,13 +56,13 @@ void ofApp::draw(){
 	mat4 view{ rotate(cameraTilt, vec3(1,0,0)) * rotate(cameraHead, vec3(0,1,0)) * translate(-cam.pos)};
 
 	//draw low LOD terrain in the background
-	mat4 projection{ perspective(radians(90.0f), aspect, 450.0f, 2000.0f)};
+	mat4 projection{ perspective(radians(90.0f), aspect, 200.0f, 5000.0f)};
 	mat4 model{ mat4()};
 	mat4 mvp{ projection * view * model };
 	
 	terrainShader.begin();
 	terrainShader.setUniform1f("fogStart", 500.0f);
-	terrainShader.setUniform1f("fogEnd", 2000.0f);
+	terrainShader.setUniform1f("fogEnd", 5000.0f);
 	terrainShader.setUniform3f("meshColor", TERRAIN_COLOR);
 	terrainShader.setUniform3f("lightDirection", mainLight.direction);
 	terrainShader.setUniform3f("lightColor", normalize(mainLight.lightColor));
@@ -81,13 +81,13 @@ void ofApp::draw(){
     projection = perspective(radians(90.0f), aspect, 0.01f, 500.0f);
 	mvp = projection * view * model;
 	terrainShader.setUniformMatrix4f("mvp", mvp);
-	terrainShader.setUniform1f("fogStart", 450.0f);
+	terrainShader.setUniform1f("fogStart", 400.0f);
 	terrainShader.setUniform1f("fogEnd", 500.0f);
 	cellManager.drawActiveCells(cam.pos, 1000.0f);
 	terrainShader.setUniform3f("meshColor", WATER_COLOR);
 	water.draw();
 	terrainShader.end();
-}
+	}
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
