@@ -1,7 +1,8 @@
 #pragma once
 
 #include "ofMain.h"
-
+#include "Camera.h"
+#include "SceneGraphNode.h"
 class ofApp : public ofBaseApp{
 
 	public:
@@ -20,5 +21,22 @@ class ofApp : public ofBaseApp{
 		void windowResized(int w, int h);
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
+		void updateCameraRotation(float dx, float dy);
+	protected:
+		Camera camera;
+		glm::vec3 velocity{ 0,0,0 };
+		glm::vec3 velocityWorldSpace;
+		int speed{ 5 };
+		float sensitivity{ 0.6 };
+		bool reload{ false };
+		ofShader robotShader;
+
+		ofMesh arm;
+		ofMesh body;
+		ofMesh head;
+		ofMesh eye;
+		ofMesh wheel;
 		
+		// root node of the scene graph
+		SceneGraphNode sceneGraphRoot{};
 };

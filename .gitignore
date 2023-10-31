@@ -405,3 +405,6 @@ Project 3/bin/data/assets/TamrielBeta_10_2016_01.png
 Project 3/bin/data/assets/TamrielLowRes.png
 Project 3/bin/data/assets/TamrielHighRes.png
 Project 3/bin/data/assets/RandomLowRes.png
+Project 4/Project 4.vcxproj.filters
+*.rc
+*.filters
