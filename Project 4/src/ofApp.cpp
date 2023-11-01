@@ -2,18 +2,21 @@
 #include "CameraMatrices.h"
 #include "SimpleDrawNode.h"
 #include "SimpleAnimationNode.h"
+#include "LitDrawNode.h"
+#include "Lighting.h"
 #include <memory>
 
 void ofApp::updateCameraRotation(float dx, float dy) {
 	dx *= ofGetLastFrameTime() * sensitivity;
 	dy *= ofGetLastFrameTime() * sensitivity;
-	camera.rotation = camera.rotation * glm::mat3(glm::rotate(dx, glm::vec3(1, 0, 0)) * glm::rotate(dy, glm::vec3(0, 1, 0)));
+	camera.rotation = camera.rotation * glm::mat3(glm::rotate(dx, glm::vec3(0, 1, 0)) * glm::rotate(dy, glm::vec3(1, 0, 0)));
 }
 //--------------------------------------------------------------
+
 void ofApp::setup(){
 	ofDisableArbTex();
+	ofEnableDepthTest();
 	camera.position = glm::vec3(0, 0, 2);
-//	camera.rotation = glm::mat3(rotate(0.0f, glm::vec3(0,0,0)));
 
 	head.load("models/cone.ply");
 	body.load("models/cylinder.ply");
@@ -22,41 +25,47 @@ void ofApp::setup(){
 	wheel.load("models/torus.ply");
 	robotShader.load("shaders/robot.vert", "shaders/robot.frag");
 	
-	//Init scene graph
 	using namespace glm;
-
+	Lighting lighting;
+	lighting.dirLight.direction = vec3(1, 1, 1);
+	lighting.ambientLight = vec3(0.1);
+	//Init scene graph
 	//Create the Head and Eyes
 	sceneGraphRoot.localTransform = translate(vec3(0, 0, -2));
-	sceneGraphRoot.childNodes.emplace_back(new SimpleDrawNode{ head, robotShader }); // Create Head
+	sceneGraphRoot.childNodes.emplace_back(new LitDrawNode{ head, robotShader, lighting, vec3(0.1,0.1,0.5)}); // Create Head
 	std::shared_ptr<SceneGraphNode> headNode = sceneGraphRoot.childNodes.back();
-	headNode->localTransform = translate(vec3(0, 1, 0));
-	headNode->childNodes.emplace_back(new SimpleDrawNode{ eye, robotShader });
-	headNode->childNodes.back()->localTransform = translate(vec3(0.25, 0, 0)); //Right Eye
-	headNode->childNodes.emplace_back(new SimpleDrawNode{ eye, robotShader });
-	headNode->childNodes.back()->localTransform = translate(vec3(-0.25, 0, 0)); //Left Eye
+	headNode->localTransform = translate(vec3(0, 2, 0));
+	headNode->childNodes.emplace_back(new LitDrawNode{ eye, robotShader, lighting, vec3(0.1,0.5,0.1)});
+	headNode->childNodes.back()->localTransform = translate(vec3(0.5, 0, 0)) * scale(vec3(0.25)); //Right Eye
+	headNode->childNodes.emplace_back(new LitDrawNode{ eye, robotShader, lighting, vec3(0.1,0.5,0.1)});
+	headNode->childNodes.back()->localTransform = translate(vec3(-0.5, 0, 0)) * scale(vec3(0.25)); //Left Eye
 	
 	//Create the body
-	sceneGraphRoot.childNodes.emplace_back(new SimpleDrawNode{ body, robotShader });
+	sceneGraphRoot.childNodes.emplace_back(new LitDrawNode{ body, robotShader, lighting, vec3(0.1,0.1,0.5)});
 	std::shared_ptr<SceneGraphNode> bodyNode = sceneGraphRoot.childNodes.back();
 
 	//Create the Arms
-	bodyNode->childNodes.emplace_back(new SimpleAnimationNode{ 1.0f, glm::vec3(0,1,0) });
+	bodyNode->childNodes.emplace_back(new SimpleAnimationNode{ 1.0f, glm::vec3(0,1,0) }); //Pivot for Right Arm
 	std::shared_ptr<SceneGraphNode> armNode = bodyNode->childNodes.back();
-	armNode->localTransform = translate(vec3(1, 0, 0));
-	armNode->childNodes.emplace_back(new SimpleDrawNode{ arm, robotShader });
-	bodyNode->childNodes.emplace_back(new SimpleAnimationNode(1.0f, glm::vec3(0, 1, 0)));
+	armNode->localTransform = translate(vec3(2, 0, 0));
+	armNode->childNodes.emplace_back(new LitDrawNode{ arm, robotShader, lighting, vec3(0.5,0.1,0.1)});//Right Arm
+	armNode->childNodes.back()->localTransform = scale(vec3(1, 0.25, 0.25));
+	bodyNode->childNodes.emplace_back(new SimpleAnimationNode(1.0f, glm::vec3(0, 1, 0))); //Pivot for Left Arm
 	armNode = bodyNode->childNodes.back();
-	armNode->localTransform = translate(vec3(-1, 0, 0));
-	armNode->childNodes.emplace_back(new SimpleDrawNode{ arm, robotShader });
+	armNode->localTransform = translate(vec3(-2, 0, 0));
+	armNode->childNodes.emplace_back(new LitDrawNode{ arm, robotShader, lighting, vec3(0.5,0.1,0.1)}); //Left Arm
+	armNode->childNodes.back()->localTransform = scale(vec3(1, 0.25, 0.25));
 
 	//Create the wheels
-	bodyNode->childNodes.emplace_back(new SimpleAnimationNode{ 2.0f, glm::vec3(0,1,0) });
-	std::shared_ptr<SceneGraphNode> wheelPivot = bodyNode->childNodes.back();
-	wheelPivot->localTransform = translate(vec3(0, -1, 0));
-	wheelPivot->childNodes.emplace_back(new SimpleDrawNode{ wheel, robotShader });
-	wheelPivot->childNodes.back()->localTransform = translate(vec3(0.5, 0, 0)); // Right Wheel
-	wheelPivot->childNodes.emplace_back(new SimpleDrawNode{ wheel, robotShader });
-	wheelPivot->childNodes.back()->localTransform = translate(vec3(-0.5, 0, 0)); // Left Wheel
+	bodyNode->childNodes.emplace_back(new SceneGraphNode{});
+	bodyNode->childNodes.back()->localTransform = translate(vec3(0, -2, 0));
+	bodyNode->childNodes.back()->childNodes.emplace_back(new SimpleAnimationNode{ radians(90.0f), glm::vec3(1,0,0)});
+	std::shared_ptr<SceneGraphNode> wheelPivot = bodyNode->childNodes.back()->childNodes.back();
+	wheelPivot->localTransform = rotate(radians(90.0f), vec3(0,0,1)) ;
+	wheelPivot->childNodes.emplace_back(new LitDrawNode{ wheel, robotShader, lighting, vec3(0.2,0.2,0.2)});
+	wheelPivot->childNodes.back()->localTransform = translate(vec3(0, -0.5, 0)); // Right Wheel
+	wheelPivot->childNodes.emplace_back(new LitDrawNode{ wheel, robotShader, lighting, vec3(0.2,0.2,0.2)});
+	wheelPivot->childNodes.back()->localTransform = translate(vec3(0, 0.5, 0)); // Left Wheel
 }
 
 //--------------------------------------------------------------
@@ -123,7 +132,12 @@ void ofApp::keyReleased(int key){
 
 //--------------------------------------------------------------
 void ofApp::mouseMoved(int x, int y ){
-
+	if (mouseX != 0 && mouseY != 0)
+	{
+		updateCameraRotation(mouseX - x, mouseY - y);
+	}
+	mouseX = x;
+	mouseY = y;
 }
 
 //--------------------------------------------------------------

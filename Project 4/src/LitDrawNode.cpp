@@ -1,10 +1,11 @@
 #include "LitDrawNode.h"
 
-LitDrawNode::LitDrawNode(const ofMesh& mesh, const ofShader& shader, const Lighting& sceneLighting)
-    : SimpleDrawNode(mesh, shader), sceneLighting { sceneLighting }
+LitDrawNode::LitDrawNode(const ofMesh& mesh, const ofShader& shader, const Lighting& sceneLighting, const glm::vec3 mColor)
+    : SimpleDrawNode(mesh, shader), sceneLighting { sceneLighting }, meshColor{mColor}
 {
 }
 
+// sceneLighting is set correctly in constructor but resets somehow by the time it makes it to drawNode
 void LitDrawNode::drawNode(const CameraMatrices& camera, const glm::mat4& model) const
 {
     using namespace glm;

@@ -22,12 +22,14 @@ class ofApp : public ofBaseApp{
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
 		void updateCameraRotation(float dx, float dy);
-	protected:
+	private:
 		Camera camera;
 		glm::vec3 velocity{ 0,0,0 };
 		glm::vec3 velocityWorldSpace;
 		int speed{ 5 };
 		float sensitivity{ 0.6 };
+		int mouseX{ 0 };
+		int mouseY{ 0 };
 		bool reload{ false };
 		ofShader robotShader;
 
