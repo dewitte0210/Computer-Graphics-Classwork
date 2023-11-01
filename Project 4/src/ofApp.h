@@ -3,6 +3,7 @@
 #include "ofMain.h"
 #include "Camera.h"
 #include "SceneGraphNode.h"
+#include "Lighting.h"
 class ofApp : public ofBaseApp{
 
 	public:
@@ -33,6 +34,7 @@ class ofApp : public ofBaseApp{
 		bool reload{ false };
 		ofShader robotShader;
 
+		Lighting lighting;
 		ofMesh arm;
 		ofMesh body;
 		ofMesh head;

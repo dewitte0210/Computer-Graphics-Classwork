@@ -26,8 +26,7 @@ void ofApp::setup(){
 	robotShader.load("shaders/robot.vert", "shaders/robot.frag");
 	
 	using namespace glm;
-	Lighting lighting;
-	lighting.dirLight.direction = vec3(1, 1, 1);
+	lighting.dirLight.direction = vec3(-1, 1, -1);
 	lighting.ambientLight = vec3(0.1);
 	//Init scene graph
 	//Create the Head and Eyes
