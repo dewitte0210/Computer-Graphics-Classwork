@@ -3,6 +3,7 @@
 #include "ofMain.h"
 #include "Camera.h"
 #include "SceneGraphNode.h"
+#include "SpotLightNode.h"
 #include "Lighting.h"
 class ofApp : public ofBaseApp{
 
@@ -43,4 +44,5 @@ class ofApp : public ofBaseApp{
 		
 		// root node of the scene graph
 		SceneGraphNode sceneGraphRoot{};
+		std::shared_ptr<SpotLightNode> spotLightNode{ new SpotLightNode{} };
 };

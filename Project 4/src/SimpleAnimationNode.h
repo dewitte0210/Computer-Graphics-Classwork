@@ -9,7 +9,6 @@ public:
 protected:
     virtual void updateNode(float dt, const glm::mat4& model) override;
 
-private:
     float rotationSpeed;
     glm::vec3 rotationAxis;
 };

@@ -28,7 +28,7 @@ void main(){
     //Spot Light Calculations
     vec3 toSpotLight = (spotLightPos - worldPosition);
     vec3 spotLightDir = normalize(toSpotLight);
-    float cosAngle = step(spotLightCutoff, dot(spotLightDir, -spotLightConeDir));
+    float cosAngle = 1 - step(spotLightCutoff, dot(spotLightDir, -spotLightConeDir));
     vec3 spotLight = spotLightColor * cosAngle;
 
     vec3 irradiance = directionalLight + pointLight + spotLight + ambientColor; 

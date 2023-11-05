@@ -2,7 +2,9 @@
 #include "CameraMatrices.h"
 #include "SimpleDrawNode.h"
 #include "SimpleAnimationNode.h"
+#include "WalkingAnimationNode.h"
 #include "LitDrawNode.h"
+#include "SpotLightNode.h"
 #include "Lighting.h"
 #include <memory>
 
@@ -13,7 +15,7 @@ void ofApp::updateCameraRotation(float dx, float dy) {
 }
 //--------------------------------------------------------------
 
-void ofApp::setup(){
+void ofApp::setup() {
 	ofDisableArbTex();
 	ofEnableDepthTest();
 	camera.position = glm::vec3(0, 0, 2);
@@ -24,22 +26,30 @@ void ofApp::setup(){
 	arm.load("models/cube.ply");
 	wheel.load("models/torus.ply");
 	robotShader.load("shaders/robot.vert", "shaders/robot.frag");
-	
+
 	using namespace glm;
 	lighting.dirLight.direction = vec3(-1, 1, -1);
-	lighting.ambientLight = vec3(0.1f);
-	lighting.spotLight.direction = vec3(1, 1 , 1);
-	lighting.spotLight.cutoff = 0.3f;
-	lighting.spotLight.position = vec3(-1, 1, -1);
-	lighting.spotLight.color = vec3(0.3f);
+	lighting.ambientLight = vec3(0.1f);	
 	lighting.pointLight.position = vec3(-1, -1, -1);
-	lighting.pointLight.color = vec3(0.1,0.4,0.9);
-	
+	lighting.pointLight.color = vec3(0.1, 0.5, 0.1);
+//	lighting.spotLight.direction = vec3(1, -1, 1);
+//	lighting.spotLight.cutoff = 0.005f;
+//	lighting.spotLight.color = vec3(0.5f);
+//	lighting.spotLight.position = vec3(0.0f, 0.0f, 0.0f);
 	//Init scene graph
-	//Create the Head and Eyes
-	sceneGraphRoot.localTransform = translate(vec3(0, 0, -2));
-	sceneGraphRoot.childNodes.emplace_back(new LitDrawNode{ head, robotShader, lighting, vec3(0.1,0.1,0.5)}); // Create Head
-	std::shared_ptr<SceneGraphNode> headNode = sceneGraphRoot.childNodes.back();
+	// Creates the node that holds the center of the sceneGraph and that animated node that makes the robot move in a circle
+	sceneGraphRoot.localTransform = translate(vec3(0, 0, 0));
+	sceneGraphRoot.childNodes.emplace_back(new SimpleAnimationNode{ 0.5f, vec3(0,1,0) });
+	sceneGraphRoot.childNodes.back()->childNodes.emplace_back(spotLightNode);
+	spotLightNode->localTransform = rotate(radians(180.0f), vec3(0, 1, 0));
+	sceneGraphRoot.childNodes.back()->childNodes.emplace_back(new SceneGraphNode{});
+	std::shared_ptr<SceneGraphNode> robotRoot = sceneGraphRoot.childNodes.back()->childNodes.back();
+	robotRoot->childNodes.emplace_back(new SceneGraphNode{});
+	robotRoot->childNodes.back()->localTransform = translate(vec3(0, 0, -5)) * rotate(radians(-90.0f), vec3(0,1,0));
+	
+	//Create the head and eyes	
+	robotRoot->childNodes.back()->childNodes.emplace_back(new LitDrawNode{ head, robotShader, lighting,vec3(0.1,0.1,0.5) });
+	std::shared_ptr<SceneGraphNode> headNode = robotRoot->childNodes.back()->childNodes.back();
 	headNode->localTransform = translate(vec3(0, 2, 0));
 	headNode->childNodes.emplace_back(new LitDrawNode{ eye, robotShader, lighting, vec3(0.1,0.5,0.1)});
 	headNode->childNodes.back()->localTransform = translate(vec3(0.5, 0, 0)) * scale(vec3(0.25)); //Right Eye
@@ -47,20 +57,24 @@ void ofApp::setup(){
 	headNode->childNodes.back()->localTransform = translate(vec3(-0.5, 0, 0)) * scale(vec3(0.25)); //Left Eye
 	
 	//Create the body
-	sceneGraphRoot.childNodes.emplace_back(new LitDrawNode{ body, robotShader, lighting, vec3(0.1,0.1,0.5)});
-	std::shared_ptr<SceneGraphNode> bodyNode = sceneGraphRoot.childNodes.back();
-
+	robotRoot->childNodes.back()->childNodes.emplace_back(new LitDrawNode{ body, robotShader, lighting, vec3(0.1,0.1,0.5)});
+	std::shared_ptr<SceneGraphNode> bodyNode = robotRoot->childNodes.back()->childNodes.back();
 	//Create the Arms
-	bodyNode->childNodes.emplace_back(new SimpleAnimationNode{ 1.0f, glm::vec3(0,1,0) }); //Pivot for Right Arm
-	std::shared_ptr<SceneGraphNode> armNode = bodyNode->childNodes.back();
-	armNode->localTransform = translate(vec3(2, 0, 0));
+	bodyNode->childNodes.emplace_back(new SceneGraphNode{});
+	std::shared_ptr<SceneGraphNode> armsParent = bodyNode->childNodes.back();
+	armsParent->localTransform = rotate(radians(-90.0f), glm::vec3(0, 1, 0));
+
+	armsParent->childNodes.emplace_back(new WalkingAnimationNode{ 0.5f, glm::vec3(0,0,1), 0.785f}); //Pivot for Right Arm
+	std::shared_ptr<SceneGraphNode> armNode = armsParent->childNodes.back();
+	armNode->localTransform = translate(vec3(0, 0, 1.25));
 	armNode->childNodes.emplace_back(new LitDrawNode{ arm, robotShader, lighting, vec3(0.5,0.1,0.1)});//Right Arm
-	armNode->childNodes.back()->localTransform = scale(vec3(1, 0.25, 0.25));
-	bodyNode->childNodes.emplace_back(new SimpleAnimationNode(1.0f, glm::vec3(0, 1, 0))); //Pivot for Left Arm
-	armNode = bodyNode->childNodes.back();
-	armNode->localTransform = translate(vec3(-2, 0, 0));
+	armNode->childNodes.back()->localTransform = translate(vec3(0.5,0,0)) * scale(vec3(0.75, 0.25, 0.25));
+
+	armsParent->childNodes.emplace_back(new WalkingAnimationNode(0.5f, glm::vec3(0,0,1), 0.785f, false)); //Pivot for Left Arm
+	armNode = armsParent->childNodes.back();
+	armNode->localTransform = translate(vec3(0, 0, -1.25));
 	armNode->childNodes.emplace_back(new LitDrawNode{ arm, robotShader, lighting, vec3(0.5,0.1,0.1)}); //Left Arm
-	armNode->childNodes.back()->localTransform = scale(vec3(1, 0.25, 0.25));
+	armNode->childNodes.back()->localTransform = translate(vec3(0.5,0,0)) * scale(vec3(0.75, 0.25, 0.25));
 
 	//Create the wheels
 	bodyNode->childNodes.emplace_back(new SceneGraphNode{});
@@ -72,6 +86,10 @@ void ofApp::setup(){
 	wheelPivot->childNodes.back()->localTransform = translate(vec3(0, -0.5, 0)); // Right Wheel
 	wheelPivot->childNodes.emplace_back(new LitDrawNode{ wheel, robotShader, lighting, vec3(0.2,0.2,0.2)});
 	wheelPivot->childNodes.back()->localTransform = translate(vec3(0, 0.5, 0)); // Left Wheel
+	
+	spotLightNode->spotLight.cutoff = 0.3f;
+	spotLightNode->spotLight.color = vec3(1.0f,0.1f,0.1f);
+	lighting.spotLight = spotLightNode->spotLight;
 }
 
 //--------------------------------------------------------------
@@ -93,6 +111,7 @@ void ofApp::draw(){
 	mat4 model{};
 	sceneGraphRoot.drawSceneGraph(camData, model);
 	sceneGraphRoot.updateSceneGraph(ofGetLastFrameTime(), model);
+	lighting.spotLight = spotLightNode->spotLight;
 }
 
 //--------------------------------------------------------------
