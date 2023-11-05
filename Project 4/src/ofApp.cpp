@@ -27,7 +27,14 @@ void ofApp::setup(){
 	
 	using namespace glm;
 	lighting.dirLight.direction = vec3(-1, 1, -1);
-	lighting.ambientLight = vec3(0.1);
+	lighting.ambientLight = vec3(0.1f);
+	lighting.spotLight.direction = vec3(1, 1 , 1);
+	lighting.spotLight.cutoff = 0.3f;
+	lighting.spotLight.position = vec3(-1, 1, -1);
+	lighting.spotLight.color = vec3(0.3f);
+	lighting.pointLight.position = vec3(-1, -1, -1);
+	lighting.pointLight.color = vec3(0.1,0.4,0.9);
+	
 	//Init scene graph
 	//Create the Head and Eyes
 	sceneGraphRoot.localTransform = translate(vec3(0, 0, -2));
