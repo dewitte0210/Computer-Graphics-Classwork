@@ -18,7 +18,8 @@ void ofApp::updateCameraRotation(float dx, float dy) {
 void ofApp::setup() {
 	ofDisableArbTex();
 	ofEnableDepthTest();
-	camera.position = glm::vec3(0, 0, 2);
+	glEnable(GL_CULL_FACE);
+	camera.position = glm::vec3(0, 0, 0);
 
 	head.load("models/cone.ply");
 	body.load("models/cylinder.ply");
@@ -32,10 +33,7 @@ void ofApp::setup() {
 	lighting.ambientLight = vec3(0.1f);	
 	lighting.pointLight.position = vec3(-1, -1, -1);
 	lighting.pointLight.color = vec3(0.1, 0.5, 0.1);
-//	lighting.spotLight.direction = vec3(1, -1, 1);
-//	lighting.spotLight.cutoff = 0.005f;
-//	lighting.spotLight.color = vec3(0.5f);
-//	lighting.spotLight.position = vec3(0.0f, 0.0f, 0.0f);
+
 	//Init scene graph
 	// Creates the node that holds the center of the sceneGraph and that animated node that makes the robot move in a circle
 	sceneGraphRoot.localTransform = translate(vec3(0, 0, 0));
@@ -87,7 +85,7 @@ void ofApp::setup() {
 	wheelPivot->childNodes.emplace_back(new LitDrawNode{ wheel, robotShader, lighting, vec3(0.2,0.2,0.2)});
 	wheelPivot->childNodes.back()->localTransform = translate(vec3(0, 0.5, 0)); // Left Wheel
 	
-	spotLightNode->spotLight.cutoff = 0.3f;
+	spotLightNode->spotLight.cutoff = 0.80f;
 	spotLightNode->spotLight.color = vec3(1.0f,0.1f,0.1f);
 	lighting.spotLight = spotLightNode->spotLight;
 }
