@@ -11,7 +11,7 @@
 void ofApp::updateCameraRotation(float dx, float dy) {
 	dx *= ofGetLastFrameTime() * sensitivity;
 	dy *= ofGetLastFrameTime() * sensitivity;
-	camera.rotation = camera.rotation * glm::mat3(glm::rotate(dx, glm::vec3(0, 1, 0)) * glm::rotate(dy, glm::vec3(1, 0, 0)));
+	camera.rotation *= glm::mat3(glm::rotate(dy, glm::vec3(1, 0, 0)) * glm::rotate(dx, glm::vec3(0, 1, 0)));
 }
 //--------------------------------------------------------------
 
@@ -39,7 +39,6 @@ void ofApp::setup() {
 	sceneGraphRoot.localTransform = translate(vec3(0, 0, 0));
 	sceneGraphRoot.childNodes.emplace_back(new SimpleAnimationNode{ 0.5f, vec3(0,1,0) });
 	sceneGraphRoot.childNodes.back()->childNodes.emplace_back(spotLightNode);
-	spotLightNode->localTransform = rotate(radians(180.0f), vec3(0, 1, 0));
 	sceneGraphRoot.childNodes.back()->childNodes.emplace_back(new SceneGraphNode{});
 	std::shared_ptr<SceneGraphNode> robotRoot = sceneGraphRoot.childNodes.back()->childNodes.back();
 	robotRoot->childNodes.emplace_back(new SceneGraphNode{});
@@ -85,7 +84,7 @@ void ofApp::setup() {
 	wheelPivot->childNodes.emplace_back(new LitDrawNode{ wheel, robotShader, lighting, vec3(0.2,0.2,0.2)});
 	wheelPivot->childNodes.back()->localTransform = translate(vec3(0, 0.5, 0)); // Left Wheel
 	
-	spotLightNode->spotLight.cutoff = 0.80f;
+	spotLightNode->spotLight.cutoff = 0.98f;
 	spotLightNode->spotLight.color = vec3(1.0f,0.1f,0.1f);
 	lighting.spotLight = spotLightNode->spotLight;
 }
@@ -97,6 +96,7 @@ void ofApp::update(){
 		reload = false;
 	}
 	velocityWorldSpace = camera.rotation * velocity * ofGetLastFrameTime();
+	sceneGraphRoot.updateSceneGraph(ofGetLastFrameTime(), glm::mat4{});
 }
 
 //--------------------------------------------------------------
@@ -108,7 +108,6 @@ void ofApp::draw(){
 	
 	mat4 model{};
 	sceneGraphRoot.drawSceneGraph(camData, model);
-	sceneGraphRoot.updateSceneGraph(ofGetLastFrameTime(), model);
 	lighting.spotLight = spotLightNode->spotLight;
 }
 

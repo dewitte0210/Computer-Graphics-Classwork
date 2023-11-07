@@ -29,7 +29,7 @@ class ofApp : public ofBaseApp{
 		glm::vec3 velocity{ 0,0,0 };
 		glm::vec3 velocityWorldSpace;
 		int speed{ 5 };
-		float sensitivity{ 0.6 };
+		float sensitivity{ 0.6f };
 		int mouseX{ 0 };
 		int mouseY{ 0 };
 		bool reload{ false };
