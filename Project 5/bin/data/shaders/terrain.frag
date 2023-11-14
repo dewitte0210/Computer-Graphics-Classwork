@@ -2,12 +2,13 @@
 
 uniform vec3 lightDirection;
 uniform vec3 lightColor;
-uniform vec3 meshColor;
 uniform vec3 ambientColor;
 uniform float fogStart;
 uniform float fogEnd;
+uniform sampler2D tex;
 in vec3 fragNormal;
 in vec3 cameraSpacePos;
+in vec2 fragUV;
 out vec4 outColor;
 
 void main(){
@@ -16,5 +17,5 @@ void main(){
 	float nDotL = max(0, dot(normal, lightDirection)); //calculate light intensty Cos(Theta)
 	vec3 irradiance = ambientColor + lightColor * nDotL; // How much light the surface recieves
 		
-	outColor = vec4(pow(meshColor * irradiance, vec3(1.0/2.2)), 1.0 - alpha);
+	outColor = texture(tex, fragUV) * vec4(pow(irradiance, vec3(1.0/2.2)), 1.0 - alpha);
 }

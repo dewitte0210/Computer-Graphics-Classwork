@@ -408,3 +408,5 @@ Project 3/bin/data/assets/RandomLowRes.png
 Project 4/Project 4.vcxproj.filters
 *.rc
 *.filters
+Project 5/bin/data/textures/TamrielHighRes.png
+Project 5/bin/data/textures/TamrielLowRes.png

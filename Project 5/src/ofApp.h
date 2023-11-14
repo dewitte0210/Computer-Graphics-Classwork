@@ -2,15 +2,15 @@
 
 #include "ofMain.h"
 #include "CellManager.h"
-struct CameraData {
-	glm::vec3 pos;
-	float rot;
-	float fov;
-};
+#include "ofxCubemap.h"
+#include "Camera.h"
+#include "CameraMatrices.h"
+
 struct pointLight {
 	glm::vec3 direction;
 	glm::vec3 lightColor;
 };
+
 class ofApp : public ofBaseApp{
 
 	public:
@@ -29,19 +29,33 @@ class ofApp : public ofBaseApp{
 		void windowResized(int w, int h);
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
+		void reloadShaders();
+		void drawCube(const CameraMatrices& camera);
 private:
 	ofShader terrainShader;
+	ofShader waterShader;
+	ofShader skyboxShader;
+	
 	ofVboMesh terrain;
-	const glm::vec3 TERRAIN_COLOR{ 0.2, 1,0.4 };
-	const glm::vec3 WATER_COLOR{ 0.1,0.4,0.8 };
 	ofVboMesh water;
+	ofMesh cubeMesh;
+
 	ofShortImage heightmap;
 	ofShortImage highResHeightmap;
+	ofImage terrainTex;
+	
+	ofxCubemap cubeMap;
+
+	bool needsReload{ false };
+
+	const glm::vec3 TERRAIN_COLOR{ 0.2, 1,0.4 };
+	const glm::vec3 WATER_COLOR{ 0.1,0.4,0.8 };
+
 
 	CellManager<5> cellManager{ highResHeightmap, 1600, 256 };
 	pointLight mainLight;
 
-	CameraData cam;
+	Camera camera;
 	glm::vec3 velocity;
 	glm::vec3 velocityWorldSpace;
 	int speed{ 150 };

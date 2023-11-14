@@ -16,5 +16,5 @@ void main(){
 	float nDotL = max(0, dot(normal, lightDirection)); //calculate light intensty Cos(Theta)
 	vec3 irradiance = ambientColor + lightColor * nDotL; // How much light the surface recieves
 		
-	outColor = vec4(pow(meshColor * irradiance, vec3(1.0/2.2)), max(alpha, 0.5));
+	outColor = vec4(pow(meshColor * irradiance, vec3(1.0/2.2)), 1.0 - alpha);
 }
