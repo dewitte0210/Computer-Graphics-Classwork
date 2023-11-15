@@ -1,7 +1,7 @@
 #pragma once
 #include "ofMain.h"
 #include "buildTerrainMesh.h"
-
+#include "calcTangents.h"
 // A struct for maintaining the state of a single cell.
 struct Cell
 {
@@ -264,6 +264,7 @@ private:
             // Use buildTerrainMesh() to initialize or re-initialize the mesh.
             // The scale parameter taken by buildTerrainMesh needs to be relative to the dimensions of the heightmap
             buildTerrainMesh(terrainMesh, heightmap.getPixels(), startPos.x, startPos.y, startPos.x + size.x, startPos.y + size.y, glm::vec3(1, heightmapScale, 1));
+            calcTangents(terrainMesh);
         }
     }
     

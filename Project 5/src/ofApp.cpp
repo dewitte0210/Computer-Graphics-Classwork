@@ -1,6 +1,7 @@
 #include "ofApp.h"
 #include "buildTerrainMesh.h"
 #include "CameraMatrices.h"
+#include "calcTangents.h"
 void ofApp::updateCameraRotation(float dx, float dy) {
 	dx *= ofGetLastFrameTime();
 	dy *= ofGetLastFrameTime();
@@ -10,7 +11,12 @@ void ofApp::reloadShaders() {
 	terrainShader.load("shaders/terrain.vert", "shaders/terrain.frag");
 	skyboxShader.load("shaders/skybox.vert", "shaders/skybox.frag");
 }
-
+void setupTexture(ofImage& tex, string filepath) {
+	tex.load(filepath);
+	tex.getTexture().setTextureMinMagFilter(GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
+	tex.getTexture().generateMipmap();
+	tex.getTexture().setTextureWrap(GL_REPEAT, GL_REPEAT);
+}
 void ofApp::drawCube(const CameraMatrices& camera) {
 	skyboxShader.begin();
 	glDepthFunc(GL_LEQUAL);
@@ -49,6 +55,7 @@ void ofApp::setup(){
 	
 	float scale{ (highResHeightmap.getWidth() - 1) / (heightmap.getWidth() - 1) };
 	buildTerrainMesh(terrain, heightmap, 0, 0, heightmap.getWidth() - 1, heightmap.getHeight() - 1, glm::vec3(scale, 50 * scale, scale));
+	calcTangents(terrain);
 	camera.position = glm::vec3((highResHeightmap.getWidth() - 1) * 0.5f, 820, (highResHeightmap.getHeight() - 1) * 0.5f);
 	cellManager.initializeForPosition(camera.position);
 
@@ -61,10 +68,9 @@ void ofApp::setup(){
 	waterShader.load("shaders/water.vert", "shaders/water.frag");
 	terrainShader.load("shaders/terrain.vert", "shaders/terrain.frag");
 
-	terrainTex.load("textures/aerial_grass_rock_diff_4k.png");
-	terrainTex.getTexture().setTextureMinMagFilter(GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
-	terrainTex.getTexture().generateMipmap();
-	terrainTex.getTexture().setTextureWrap(GL_REPEAT, GL_REPEAT);
+	setupTexture(terrainTex, "textures/aerial_grass_rock_diff_4k.png");
+	setupTexture(terrainNrml, "textures/aerial_grass_rock_nor_4k.png");
+	setupTexture(waterNrml, "textures/water_nrm.png");
 }
 
 //--------------------------------------------------------------
@@ -116,11 +122,12 @@ void ofApp::draw(){
 	terrainShader.setUniformMatrix3f("normalMatrix", model);
 	terrainShader.setUniformMatrix4f("modelView", camData.getView() * model);
 	terrainShader.setUniformTexture("tex", terrainTex.getTexture(), 0);
+	terrainShader.setUniformTexture("normalMap", terrainNrml.getTexture(), 1);
 	terrain.draw();
 
 	//switch to high LOD for closer terrain
 	glClear(GL_DEPTH_BUFFER_BIT);
-    projection = perspective(radians(90.0f), aspect, 0.01f, 500.0f);
+    projection = perspective(radians(90.0f), aspect, 0.5f, 500.0f);
 	mvp = projection * camData.getView() * model;
 	terrainShader.setUniformMatrix4f("mvp", mvp);
 	terrainShader.setUniform1f("fogStart", 400.0f);

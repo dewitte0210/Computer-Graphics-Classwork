@@ -43,7 +43,8 @@ private:
 	ofShortImage heightmap;
 	ofShortImage highResHeightmap;
 	ofImage terrainTex;
-	
+	ofImage terrainNrml;
+	ofImage waterNrml;
 	ofxCubemap cubeMap;
 
 	bool needsReload{ false };
