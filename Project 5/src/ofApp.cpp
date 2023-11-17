@@ -18,6 +18,7 @@ void setupTexture(ofImage& tex, string filepath) {
 	tex.getTexture().setTextureWrap(GL_REPEAT, GL_REPEAT);
 }
 void ofApp::drawCube(const CameraMatrices& camera) {
+	glDisable(GL_CULL_FACE);
 	skyboxShader.begin();
 	glDepthFunc(GL_LEQUAL);
 	skyboxShader.setUniformMatrix4f("mvp", camera.getProj() * glm::mat4(glm::mat3(camera.getView())));
@@ -25,6 +26,7 @@ void ofApp::drawCube(const CameraMatrices& camera) {
 	cubeMesh.draw();
 	skyboxShader.end();
 	glDepthFunc(GL_LESS);
+	glEnable(GL_CULL_FACE);
 }
 //--------------------------------------------------------------
 void ofApp::setup(){

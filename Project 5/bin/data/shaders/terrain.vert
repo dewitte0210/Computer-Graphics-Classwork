@@ -14,8 +14,8 @@ out vec2 fragUV;
 
 void main(){
 	gl_Position = mvp * vec4(pos, 1.0);
-	vec3 T= normalize(normalMatrix * tangent);	
-	vec3 B= normalize(normalMatrix * cross(tangent, normal));	
+	vec3 T = normalize(normalMatrix * tangent);	
+	vec3 B = normalize(normalMatrix * cross(tangent, normal));	
 	vec3 N = normalize(normalMatrix * normal);
 	TBN = mat3(T,B,N);	
 	cameraSpacePos = vec3(modelView * vec4(pos,1.0));
