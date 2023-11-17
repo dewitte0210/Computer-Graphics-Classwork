@@ -13,8 +13,8 @@ void ofApp::reloadShaders() {
 }
 void setupTexture(ofImage& tex, string filepath) {
 	tex.load(filepath);
-	tex.getTexture().setTextureMinMagFilter(GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
 	tex.getTexture().generateMipmap();
+	tex.getTexture().setTextureMinMagFilter(GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
 	tex.getTexture().setTextureWrap(GL_REPEAT, GL_REPEAT);
 }
 void ofApp::drawCube(const CameraMatrices& camera) {
@@ -49,6 +49,10 @@ void ofApp::setup(){
 	water.addVertex(glm::vec3(highResHeightmap.getWidth(), 700, 0));
 	water.addVertex(glm::vec3(0, 700, highResHeightmap.getHeight()));
 	water.addVertex(glm::vec3(highResHeightmap.getWidth(), 700, highResHeightmap.getHeight()));
+	water.addTexCoord(glm::vec2(0,0));
+	water.addTexCoord(glm::vec2(1,0));
+	water.addTexCoord(glm::vec2(0, 1));
+	water.addTexCoord(glm::vec2(1, 1));
 	ofIndexType indicies[6] = { 0,2,3,1,0,3};
 	water.addIndices(indicies, 6);
 	water.flatNormals();
@@ -109,6 +113,7 @@ void ofApp::draw(){
 	waterShader.setUniform3f("ambientColor", vec3(0.1));
 	waterShader.setUniform1f("fogStart", 500.0f);
 	waterShader.setUniform1f("fogEnd", 5000.0f);
+	waterShader.setUniformTexture("normalMap", waterNrml.getTexture(), 0);
 	water.draw();
 	waterShader.end();
 
@@ -145,6 +150,7 @@ void ofApp::draw(){
 	waterShader.setUniform3f("ambientColor", vec3(0.1));
 	waterShader.setUniform1f("fogStart", 400.0f);
 	waterShader.setUniform1f("fogEnd", 500.0f);
+	waterShader.setUniformTexture("normalMap", waterNrml.getTexture(), 0);
 	water.draw();
 	waterShader.end();
 }

@@ -14,7 +14,7 @@ void buildTerrainMesh(ofMesh& terrainMesh, const ofShortPixels& heightmap,
 			//The following are additions for project 5 
 			//add UV coordinates
 			terrainMesh.addTexCoord(glm::vec2(x / 128.0, y / 128.0));
-			
+		
 			//Calculate Normals
 			//Decide which heightmpa pixels to sample
 			//Make sure the indicies aren't out of bounds	

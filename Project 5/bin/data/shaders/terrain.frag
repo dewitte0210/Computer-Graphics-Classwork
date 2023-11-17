@@ -21,5 +21,5 @@ void main(){
 	float nDotL = max(0, dot(normal, lightDirection)); //calculate light intensty Cos(Theta)
 	vec3 irradiance = ambientColor + lightColor * nDotL; // How much light the surface recieves
 		
-	outColor = pow(texture(tex, fragUV), vec4(2.2)) * vec4(pow(irradiance, vec3(1.0/2.2)), 1.0 - alpha);
+	outColor = texture(tex, fragUV) * vec4(pow(irradiance, vec3(1.0/2.2)), 1.0 - alpha);
 }
