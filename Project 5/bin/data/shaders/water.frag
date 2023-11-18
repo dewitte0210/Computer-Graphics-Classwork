@@ -20,7 +20,7 @@ void main(){
 	normal = normalize(TBN * (normal * 2.0 - 1.0));
 
 	float nDotL = max(0, dot(normal, lightDirection)); //calculate light intensty Cos(Theta)
-	vec3 irradiance = ambientColor + lightColor * nDotL; // How much light the surface recieves
+	vec3 irradiance = ambientColor + (lightColor * nDotL); // How much light the surface recieves
 		
 	outColor = vec4(pow(meshColor * irradiance, vec3(1.0/2.2)), 1.0 - alpha);
 }

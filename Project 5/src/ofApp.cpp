@@ -10,6 +10,7 @@ void ofApp::updateCameraRotation(float dx, float dy) {
 void ofApp::reloadShaders() {
 	terrainShader.load("shaders/terrain.vert", "shaders/terrain.frag");
 	skyboxShader.load("shaders/skybox.vert", "shaders/skybox.frag");
+	needsReload = false;
 }
 void setupTexture(ofImage& tex, string filepath) {
 	tex.load(filepath);
@@ -34,8 +35,9 @@ void ofApp::setup(){
 	ofEnableDepthTest();
 	ofSetBackgroundColor(53,81,92);
 	glEnable(GL_CULL_FACE);
+
 	velocity = glm::vec3(0, 0, 0);
-	mainLight.direction = glm::vec3(-1, 1, 1);
+	mainLight.direction = glm::vec3(1, -1, 1);
 	mainLight.lightColor = glm::vec3(1);
 
 	heightmap.setUseTexture(false);
@@ -46,20 +48,12 @@ void ofApp::setup(){
 	highResHeightmap.load("textures/TamrielHighRes.png");
 	assert(highResHeightmap.getWidth() != 0 && highResHeightmap.getHeight() != 0);
 
-	//Create Water Plane
-	water.addVertex(glm::vec3(0, 700, 0));
-	water.addVertex(glm::vec3(highResHeightmap.getWidth(), 700, 0));
-	water.addVertex(glm::vec3(0, 700, highResHeightmap.getHeight()));
-	water.addVertex(glm::vec3(highResHeightmap.getWidth(), 700, highResHeightmap.getHeight()));
-	water.addTexCoord(glm::vec2(0,0));
-	water.addTexCoord(glm::vec2(1,0));
-	water.addTexCoord(glm::vec2(0, 1));
-	water.addTexCoord(glm::vec2(1, 1));
-	ofIndexType indicies[6] = { 0,2,3,1,0,3};
-	water.addIndices(indicies, 6);
-	water.flatNormals();
-	
 	float scale{ (highResHeightmap.getWidth() - 1) / (heightmap.getWidth() - 1) };
+	
+	//Create Water Plane
+	buildWaterMesh(water, 0, 0, heightmap.getWidth() - 1, heightmap.getHeight() - 1, WATER_HEIGHT, glm::vec3(scale, 1, scale));
+	calcTangents(water);
+
 	buildTerrainMesh(terrain, heightmap, 0, 0, heightmap.getWidth() - 1, heightmap.getHeight() - 1, glm::vec3(scale, 50 * scale, scale));
 	calcTangents(terrain);
 	camera.position = glm::vec3((highResHeightmap.getWidth() - 1) * 0.5f, 820, (highResHeightmap.getHeight() - 1) * 0.5f);
@@ -103,16 +97,16 @@ void ofApp::draw(){
 	//draw low LOD terrain in the background
 	mat4 projection{ perspective(radians(90.0f), aspect, 200.0f, 5000.0f)};
 	mat4 model{ mat4()};
-	mat4 mvp{ projection * camData.getView()* model };
+	mat4 mvp{ projection * camData.getView() * model };
 
 	waterShader.begin();
-	waterShader.setUniformMatrix4f("modelView", projection * model);
+	waterShader.setUniformMatrix4f("modelView", camData.getView() * model);
 	waterShader.setUniformMatrix4f("mvp", mvp);
 	waterShader.setUniformMatrix3f("normalMatrix", model);
 	waterShader.setUniform3f("lightDirection", mainLight.direction);
 	waterShader.setUniform3f("lightColor", mainLight.lightColor);
 	waterShader.setUniform3f("meshColor", WATER_COLOR);
-	waterShader.setUniform3f("ambientColor", vec3(0.1));
+	waterShader.setUniform3f("ambientColor", AMBIENT_LIGHT);
 	waterShader.setUniform1f("fogStart", 500.0f);
 	waterShader.setUniform1f("fogEnd", 5000.0f);
 	waterShader.setUniformTexture("normalMap", waterNrml.getTexture(), 0);
@@ -123,8 +117,8 @@ void ofApp::draw(){
 	terrainShader.setUniform1f("fogStart", 500.0f);
 	terrainShader.setUniform1f("fogEnd", 5000.0f);
 	terrainShader.setUniform3f("lightDirection", mainLight.direction);
-	terrainShader.setUniform3f("lightColor", normalize(mainLight.lightColor));
-	terrainShader.setUniform3f("ambientLight", vec3(0.1));
+	terrainShader.setUniform3f("lightColor", mainLight.lightColor);
+	terrainShader.setUniform3f("ambientLight", AMBIENT_LIGHT);
 	terrainShader.setUniformMatrix4f("mvp", mvp);
 	terrainShader.setUniformMatrix3f("normalMatrix", model);
 	terrainShader.setUniformMatrix4f("modelView", camData.getView() * model);
@@ -149,7 +143,7 @@ void ofApp::draw(){
 	waterShader.setUniform3f("lightDirection", mainLight.direction);
 	waterShader.setUniform3f("lightColor", mainLight.lightColor);
 	waterShader.setUniform3f("meshColor", WATER_COLOR);
-	waterShader.setUniform3f("ambientColor", vec3(0.1));
+	waterShader.setUniform3f("ambientColor", AMBIENT_LIGHT);
 	waterShader.setUniform1f("fogStart", 400.0f);
 	waterShader.setUniform1f("fogEnd", 500.0f);
 	waterShader.setUniformTexture("normalMap", waterNrml.getTexture(), 0);

@@ -50,8 +50,9 @@ private:
 	bool needsReload{ false };
 
 	const glm::vec3 TERRAIN_COLOR{ 0.2, 1,0.4 };
-	const glm::vec3 WATER_COLOR{ 0.1,0.4,0.8 };
-
+	const glm::vec3 WATER_COLOR{ 0.2,0.4,0.7 };
+	const glm::vec3 AMBIENT_LIGHT{ 0.3 };
+	const int WATER_HEIGHT{ 700 };
 
 	CellManager<5> cellManager{ highResHeightmap, 1600, 256 };
 	pointLight mainLight;

@@ -73,11 +73,66 @@ void buildTerrainMesh(ofMesh& terrainMesh, const ofShortPixels& heightmap,
         // We've reached the end of the column, advance k an extra time past the final vertex of the column, to the start of the next column.
         k++;
     }
-
-    //terrainMesh.flatNormals();
-
+    
     for (size_t i{ 0 }; i < terrainMesh.getNumNormals(); i++)
     {
         terrainMesh.setNormal(i, -terrainMesh.getNormal(i));
+    }
+}
+
+void buildWaterMesh(ofMesh& waterMesh, unsigned int xStart, unsigned int yStart, unsigned int xEnd, unsigned int yEnd, int planeHeight, vec3 scale) {
+
+    for (unsigned int x{ xStart }; x <= xEnd; x++)
+    {
+        for (unsigned int y{ yStart }; y <= yEnd; y++)
+        {
+            waterMesh.addVertex(scale * vec3(x, planeHeight, y));
+            waterMesh.addTexCoord(vec2(x / 64.0, y / 64.0));
+        }
+    }
+
+    // Initialize index buffer
+    int k{ 0 }; // k stores the index of the first corner of the quad.
+    for (unsigned int x{ xStart }; x < xEnd; x++)
+    {
+        for (unsigned int y{ yStart }; y < yEnd; y++)
+        {
+            if (k % 2)
+            {
+                // Triangle 1
+                waterMesh.addIndex(k);                           // SW
+                waterMesh.addIndex(k + 1);                       // NW
+                waterMesh.addIndex(k + (1 + yEnd - yStart));     // SE
+
+                // Triangle 2
+                waterMesh.addIndex(k + (1 + yEnd - yStart));     // SE
+                waterMesh.addIndex(k + 1);                       // NW
+                waterMesh.addIndex(k + (1 + yEnd - yStart) + 1); // NE
+            }
+            else
+            {
+                // Triangle 1
+                waterMesh.addIndex(k + 1);                       // NW
+                waterMesh.addIndex(k + (1 + yEnd - yStart) + 1); // NE
+                waterMesh.addIndex(k + (1 + yEnd - yStart));     // SE
+
+                // Triangle 2
+                waterMesh.addIndex(k + (1 + yEnd - yStart));     // SE
+                waterMesh.addIndex(k);                           // SW
+                waterMesh.addIndex(k + 1);                       // NW
+            }
+
+            k++; // Advance k to the next vertex in the "column."
+        }
+
+        // We've reached the end of the column, advance k an extra time past the final vertex of the column, to the start of the next column.
+        k++;
+    }
+
+    waterMesh.flatNormals();
+
+    for (size_t i{ 0 }; i < waterMesh.getNumNormals(); i++)
+    {
+        waterMesh.setNormal(i, -waterMesh.getNormal(i));
     }
 }

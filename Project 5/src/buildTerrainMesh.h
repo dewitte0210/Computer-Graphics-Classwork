@@ -11,3 +11,5 @@
 // -- then the position of the vertex in object space should be (x, h / SHRT_MAX (using floating-point division), y) * scale.
 void buildTerrainMesh(ofMesh& terrainMesh, const ofShortPixels& heightmap,
     unsigned int xStart, unsigned int yStart, unsigned int xEnd, unsigned int yEnd, glm::vec3 scale);
+
+void buildWaterMesh(ofMesh& waterMesh, unsigned int xStart, unsigned int yStart, unsigned int xEnd, unsigned int yEnd, int planeHeight, glm::vec3 scale);

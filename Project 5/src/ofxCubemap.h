@@ -1,9 +1,5 @@
 #pragma once
 #include "ofMain.h"
-#include "ofURLFileLoader.h"
-#include "uriparser/Uri.h"
-#include "ofTexture.h"
-#include "ofImage.h"
 
 class ofxCubemap
 {
