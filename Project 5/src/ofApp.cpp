@@ -107,6 +107,7 @@ void ofApp::draw(){
 	waterShader.setUniformMatrix4f("modelView", camData.getView() * model);
 	waterShader.setUniformMatrix4f("mvp", mvp);
 	waterShader.setUniformMatrix3f("normalMatrix", model);
+	waterShader.setUniformMatrix4f("model", model);
 	waterShader.setUniform3f("lightDirection", mainLight.direction);
 	waterShader.setUniform3f("lightColor", mainLight.lightColor);
 	waterShader.setUniform3f("meshColor", WATER_COLOR);
@@ -114,7 +115,10 @@ void ofApp::draw(){
 	waterShader.setUniform1f("fogEnd", 5000.0f);
 	waterShader.setUniformTexture("normalMap", waterNrml.getTexture(), 0);
 	waterShader.setUniformTexture("envMap", irradianceMap.getTexture(), 1);
-	waterShader.setUniform1f("time", t);
+	waterShader.setUniformTexture("reflectMap", cubeMap.getTexture(), 3);
+	waterShader.setUniform1f("time", t);	
+	waterShader.setUniform3f("camerPos", camera.position);
+	waterShader.setUniform3f("specularColor", vec3(0.1, 0.1, 0.2));
 	water.draw();
 	waterShader.end();
 
@@ -145,6 +149,7 @@ void ofApp::draw(){
 	waterShader.setUniformMatrix4f("modelView", camData.getView() * model);
 	waterShader.setUniformMatrix4f("mvp", mvp);
 	waterShader.setUniformMatrix3f("normalMatrix", model);
+	waterShader.setUniformMatrix4f("model", model);
 	waterShader.setUniform3f("lightDirection", mainLight.direction);
 	waterShader.setUniform3f("lightColor", mainLight.lightColor);
 	waterShader.setUniform3f("meshColor", WATER_COLOR);
@@ -152,7 +157,10 @@ void ofApp::draw(){
 	waterShader.setUniform1f("fogEnd", 500.0f);
 	waterShader.setUniformTexture("normalMap", waterNrml.getTexture(), 0);
 	waterShader.setUniformTexture("envMap", irradianceMap.getTexture(), 1);
+	waterShader.setUniformTexture("reflectMap", cubeMap.getTexture(), 2);
 	waterShader.setUniform1f("time", t);
+	waterShader.setUniform3f("cameraPos", camera.position);
+	waterShader.setUniform3f("specularColor", vec3(0.1, 0.1, 0.2));
 	water.draw();
 	waterShader.end();
 }

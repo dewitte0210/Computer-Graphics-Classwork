@@ -51,7 +51,7 @@ private:
 	bool needsReload{ false };
 
 	const glm::vec3 TERRAIN_COLOR{ 0.2, 1,0.4 };
-	const glm::vec3 WATER_COLOR{ 0.3,0.3,0.6 };
+	const glm::vec3 WATER_COLOR{ 0.1,0.1,0.3 };
 	const glm::vec3 AMBIENT_LIGHT{ 0.3 };
 	const int WATER_HEIGHT{ 700 };
 
