@@ -46,11 +46,12 @@ private:
 	ofImage terrainNrml;
 	ofImage waterNrml;
 	ofxCubemap cubeMap;
+	ofxCubemap irradianceMap;
 
 	bool needsReload{ false };
 
 	const glm::vec3 TERRAIN_COLOR{ 0.2, 1,0.4 };
-	const glm::vec3 WATER_COLOR{ 0.2,0.4,0.7 };
+	const glm::vec3 WATER_COLOR{ 0.3,0.3,0.6 };
 	const glm::vec3 AMBIENT_LIGHT{ 0.3 };
 	const int WATER_HEIGHT{ 700 };
 
@@ -66,5 +67,6 @@ private:
 	float cameraHead{ 0 };
 	float cameraTilt{ 0 };
 	float sensitivity{ 0.6 };
+	float t{ 0.0f };
 	void updateCameraRotation(float dx, float dy);
 };

@@ -87,7 +87,7 @@ void buildWaterMesh(ofMesh& waterMesh, unsigned int xStart, unsigned int yStart,
         for (unsigned int y{ yStart }; y <= yEnd; y++)
         {
             waterMesh.addVertex(scale * vec3(x, planeHeight, y));
-            waterMesh.addTexCoord(vec2(x / 64.0, y / 64.0));
+            waterMesh.addTexCoord(vec2(x / 8.0, y / 8.0));
         }
     }
 
@@ -128,11 +128,5 @@ void buildWaterMesh(ofMesh& waterMesh, unsigned int xStart, unsigned int yStart,
         // We've reached the end of the column, advance k an extra time past the final vertex of the column, to the start of the next column.
         k++;
     }
-
     waterMesh.flatNormals();
-
-    for (size_t i{ 0 }; i < waterMesh.getNumNormals(); i++)
-    {
-        waterMesh.setNormal(i, -waterMesh.getNormal(i));
-    }
 }

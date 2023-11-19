@@ -35,6 +35,7 @@ void ofApp::setup(){
 	ofEnableDepthTest();
 	ofSetBackgroundColor(53,81,92);
 	glEnable(GL_CULL_FACE);
+	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
 	velocity = glm::vec3(0, 0, 0);
 	mainLight.direction = glm::vec3(1, -1, 1);
@@ -63,6 +64,9 @@ void ofApp::setup(){
 	cubeMesh.load("models/cube.ply");
 	cubeMap.load("textures/skybox_front.png", "textures/skybox_back.png", "textures/skybox_right.png",
 		"textures/skybox_left.png", "textures/skybox_top.png", "textures/skybox_bottom.png");
+	irradianceMap.load("textures/irradiance_front.png", "textures/irradiance_back.png", "textures/irradiance_right.png", "textures/irradiance_left.png",
+		"textures/irradiance_top.png", "textures/irradiance_bottom.png");
+	irradianceMap.getTexture().generateMipmap();
 
 	skyboxShader.load("shaders/skybox.vert", "shaders/skybox.frag");
 	waterShader.load("shaders/water.vert", "shaders/water.frag");
@@ -86,7 +90,7 @@ void ofApp::update(){
 //--------------------------------------------------------------
 void ofApp::draw(){
 	using namespace glm;
-
+	t += ofGetLastFrameTime();
 	ofEnableBlendMode(OF_BLENDMODE_ALPHA);
 	camera.fov = radians(100.0f);
 	float aspect = static_cast<float>(ofGetWindowWidth()) / ofGetWindowHeight();
@@ -106,10 +110,11 @@ void ofApp::draw(){
 	waterShader.setUniform3f("lightDirection", mainLight.direction);
 	waterShader.setUniform3f("lightColor", mainLight.lightColor);
 	waterShader.setUniform3f("meshColor", WATER_COLOR);
-	waterShader.setUniform3f("ambientColor", AMBIENT_LIGHT);
 	waterShader.setUniform1f("fogStart", 500.0f);
 	waterShader.setUniform1f("fogEnd", 5000.0f);
 	waterShader.setUniformTexture("normalMap", waterNrml.getTexture(), 0);
+	waterShader.setUniformTexture("envMap", irradianceMap.getTexture(), 1);
+	waterShader.setUniform1f("time", t);
 	water.draw();
 	waterShader.end();
 
@@ -118,12 +123,12 @@ void ofApp::draw(){
 	terrainShader.setUniform1f("fogEnd", 5000.0f);
 	terrainShader.setUniform3f("lightDirection", mainLight.direction);
 	terrainShader.setUniform3f("lightColor", mainLight.lightColor);
-	terrainShader.setUniform3f("ambientLight", AMBIENT_LIGHT);
 	terrainShader.setUniformMatrix4f("mvp", mvp);
 	terrainShader.setUniformMatrix3f("normalMatrix", model);
 	terrainShader.setUniformMatrix4f("modelView", camData.getView() * model);
 	terrainShader.setUniformTexture("tex", terrainTex.getTexture(), 0);
 	terrainShader.setUniformTexture("normalMap", terrainNrml.getTexture(), 1);
+	terrainShader.setUniformTexture("envMap", irradianceMap.getTexture(), 2);
 	terrain.draw();
 
 	//switch to high LOD for closer terrain
@@ -143,10 +148,11 @@ void ofApp::draw(){
 	waterShader.setUniform3f("lightDirection", mainLight.direction);
 	waterShader.setUniform3f("lightColor", mainLight.lightColor);
 	waterShader.setUniform3f("meshColor", WATER_COLOR);
-	waterShader.setUniform3f("ambientColor", AMBIENT_LIGHT);
 	waterShader.setUniform1f("fogStart", 400.0f);
 	waterShader.setUniform1f("fogEnd", 500.0f);
 	waterShader.setUniformTexture("normalMap", waterNrml.getTexture(), 0);
+	waterShader.setUniformTexture("envMap", irradianceMap.getTexture(), 1);
+	waterShader.setUniform1f("time", t);
 	water.draw();
 	waterShader.end();
 }
