@@ -2,6 +2,10 @@
 #include "buildTerrainMesh.h"
 #include "CameraMatrices.h"
 #include "calcTangents.h"
+
+// TODO: Highlights from all sources
+// Fresnel effect using Schlick's approximation
+// Cook - Torrance model using GGX for distribution, Smith for masking, and Schlick's approximation
 void ofApp::updateCameraRotation(float dx, float dy) {
 	dx *= ofGetLastFrameTime();
 	dy *= ofGetLastFrameTime();
@@ -10,6 +14,7 @@ void ofApp::updateCameraRotation(float dx, float dy) {
 void ofApp::reloadShaders() {
 	terrainShader.load("shaders/terrain.vert", "shaders/terrain.frag");
 	skyboxShader.load("shaders/skybox.vert", "shaders/skybox.frag");
+	waterShader.load("shaders/water.vert", "shaders/water.frag");
 	needsReload = false;
 }
 void setupTexture(ofImage& tex, string filepath) {
@@ -64,6 +69,7 @@ void ofApp::setup(){
 	cubeMesh.load("models/cube.ply");
 	cubeMap.load("textures/skybox_front.png", "textures/skybox_back.png", "textures/skybox_right.png",
 		"textures/skybox_left.png", "textures/skybox_top.png", "textures/skybox_bottom.png");
+	cubeMap.getTexture().generateMipmap();
 	irradianceMap.load("textures/irradiance_front.png", "textures/irradiance_back.png", "textures/irradiance_right.png", "textures/irradiance_left.png",
 		"textures/irradiance_top.png", "textures/irradiance_bottom.png");
 	irradianceMap.getTexture().generateMipmap();
@@ -111,14 +117,15 @@ void ofApp::draw(){
 	waterShader.setUniform3f("lightDirection", mainLight.direction);
 	waterShader.setUniform3f("lightColor", mainLight.lightColor);
 	waterShader.setUniform3f("meshColor", WATER_COLOR);
+	waterShader.setUniform3f("camerPos", camera.position);
+	waterShader.setUniform3f("specularColor", SPECULAR_COLOR);
 	waterShader.setUniform1f("fogStart", 500.0f);
 	waterShader.setUniform1f("fogEnd", 5000.0f);
+	waterShader.setUniform1f("time", t);	
+	waterShader.setUniform1f("m", 0.5);
 	waterShader.setUniformTexture("normalMap", waterNrml.getTexture(), 0);
 	waterShader.setUniformTexture("envMap", irradianceMap.getTexture(), 1);
-	waterShader.setUniformTexture("reflectMap", cubeMap.getTexture(), 3);
-	waterShader.setUniform1f("time", t);	
-	waterShader.setUniform3f("camerPos", camera.position);
-	waterShader.setUniform3f("specularColor", vec3(0.1, 0.1, 0.2));
+	waterShader.setUniformTexture("reflectMap", cubeMap.getTexture(), 2);
 	water.draw();
 	waterShader.end();
 
@@ -153,14 +160,15 @@ void ofApp::draw(){
 	waterShader.setUniform3f("lightDirection", mainLight.direction);
 	waterShader.setUniform3f("lightColor", mainLight.lightColor);
 	waterShader.setUniform3f("meshColor", WATER_COLOR);
+	waterShader.setUniform3f("cameraPos", camera.position);
+	waterShader.setUniform3f("specularColor", SPECULAR_COLOR);
 	waterShader.setUniform1f("fogStart", 400.0f);
 	waterShader.setUniform1f("fogEnd", 500.0f);
+	waterShader.setUniform1f("time", t);
+	waterShader.setUniform1f("m", 0.5);
 	waterShader.setUniformTexture("normalMap", waterNrml.getTexture(), 0);
 	waterShader.setUniformTexture("envMap", irradianceMap.getTexture(), 1);
 	waterShader.setUniformTexture("reflectMap", cubeMap.getTexture(), 2);
-	waterShader.setUniform1f("time", t);
-	waterShader.setUniform3f("cameraPos", camera.position);
-	waterShader.setUniform3f("specularColor", vec3(0.1, 0.1, 0.2));
 	water.draw();
 	waterShader.end();
 }

@@ -54,7 +54,7 @@ private:
 	const glm::vec3 WATER_COLOR{ 0.1,0.1,0.3 };
 	const glm::vec3 AMBIENT_LIGHT{ 0.3 };
 	const int WATER_HEIGHT{ 700 };
-
+	const glm::vec3 SPECULAR_COLOR{ 0.4,0.4,0.4 };
 	CellManager<5> cellManager{ highResHeightmap, 1600, 256 };
 	pointLight mainLight;
 
