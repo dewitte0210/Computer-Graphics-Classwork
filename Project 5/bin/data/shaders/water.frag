@@ -58,7 +58,7 @@ void main(){
 	float hDotL = max(0.0, dot(halfway, envLightDir));
 	vec3 fresnel = mix(specularColor,vec3(1), pow(1 - hDotL,5));
 
-	vec3 specularReflection = fresnel * envReflection * specularColor;
+	vec3 specularReflection = fresnel * envReflection ;
 	
 	//Calculations for Specular Highlights
 	//Directional Highlights
@@ -74,11 +74,19 @@ void main(){
 	float G = 0.5 / mix(2 * uL * uV, uL + uV, pow(m,2));
 
 	vec3 directionalHighlight = D * G * dirFresnel;	
-
+	
+	//Pont Light Highlights
 	vec3 pointHalfway = normalize(pointLightDir + view);
 	float pointHDotL = dot(pointHalfway, pointLightDir);
 	vec3 pointFresnel = mix(pointLightColor, vec3(1), pow(1 - pointHDotL, 5));
 
+	nDotH = dot(pointHalfway, normal);
+	D = pow(m,2) / pow(mix(1, pow(m,2), pow(nDotH,2)),2);
 
-	outColor = vec4(pow(specularReflection + diffuse, vec3(1.0/2.2)), min(0.9, 1.0 - alpha));
+	G = 0.5 / mix(2 * uL * uV, uL + uV, pow(m,2));
+
+	vec3 pointHighlight = D * G * pointFresnel;
+	vec3 specularHighlight = directionalHighlight * pointHighlight;
+	vec3 specular = specularHighlight + specularReflection;
+	outColor = vec4(pow(specular  , vec3(1.0/2.2)), min(0.9, 1.0 - alpha));
 }
