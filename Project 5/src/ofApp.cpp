@@ -136,8 +136,10 @@ void ofApp::draw(){
 	terrainShader.begin();
 	terrainShader.setUniform1f("fogStart", 500.0f);
 	terrainShader.setUniform1f("fogEnd", 5000.0f);
-	terrainShader.setUniform3f("lightDirection", mainLight.direction);
-	terrainShader.setUniform3f("lightColor", mainLight.lightColor);
+	terrainShader.setUniform3f("dirLightDir", mainLight.direction);
+	terrainShader.setUniform3f("dirLightColor", mainLight.lightColor);
+	terrainShader.setUniform3f("pointLightPos", pointLight.position);
+	terrainShader.setUniform3f("pointLightColor", pointLight.lightColor);
 	terrainShader.setUniformMatrix4f("mvp", mvp);
 	terrainShader.setUniformMatrix3f("normalMatrix", model);
 	terrainShader.setUniformMatrix4f("modelView", camData.getView() * model);
