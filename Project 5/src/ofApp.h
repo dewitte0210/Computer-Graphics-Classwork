@@ -6,11 +6,14 @@
 #include "Camera.h"
 #include "CameraMatrices.h"
 
-struct pointLight {
+struct DirectionalLight{
 	glm::vec3 direction;
 	glm::vec3 lightColor;
 };
-
+struct PointLight {
+	glm::vec3 position;
+	glm::vec3 lightColor;
+};
 class ofApp : public ofBaseApp{
 
 	public:
@@ -56,7 +59,8 @@ private:
 	const int WATER_HEIGHT{ 700 };
 	const glm::vec3 SPECULAR_COLOR{ 0.4,0.4,0.4 };
 	CellManager<5> cellManager{ highResHeightmap, 1600, 256 };
-	pointLight mainLight;
+	DirectionalLight mainLight;
+	PointLight pointLight;
 
 	Camera camera;
 	glm::vec3 velocity;

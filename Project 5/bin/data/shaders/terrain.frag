@@ -1,7 +1,10 @@
 #version 410
 
-uniform vec3 lightDirection;
-uniform vec3 lightColor;
+uniform vec3 dirLightDir;
+uniform vec3 dirLightColor;
+uniform vec3 pointLightPos;
+uniform vec3 pointLightColor;
+
 uniform float fogStart;
 uniform float fogEnd;
 uniform sampler2D tex;
@@ -17,9 +20,15 @@ void main(){
 	double alpha = smoothstep(fogStart, fogEnd, length(cameraSpacePos));
 	vec3 normal = texture(normalMap, fragUV).rgb;	
 	normal = normalize(TBN * (normal * 2.0 - 1.0));
-	float nDotL = max(0, dot(normal, lightDirection)); //calculate light intensty Cos(Theta)
+	
+	//Directional Light
+	float nDotL = max(0, dot(normal, dirLightDir)); //calculate light intensty Cos(Theta)
+	vec3 directionalLight = nDotL * dirLightColor;
+
+	//PointLight
+
 	vec3 envIrradiance = pow(texture(envMap, normal).rgb, vec3(2.2));
-	vec3 irradiance = envIrradiance + (lightColor * nDotL); // How much light the surface recieves
+	vec3 irradiance = envIrradiance + directionalLight; // How much light the surface recieves
 	
 	//Final color calculations	
 	vec3 textureColor = vec3(pow(texture(tex, fragUV), vec4(2.2)));	
