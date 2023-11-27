@@ -45,7 +45,7 @@ void ofApp::setup(){
 	velocity = glm::vec3(0, 0, 0);
 	mainLight.direction = glm::vec3(1, -1, 1);
 	mainLight.lightColor = glm::vec3(1);
-	pointLight.position = glm::vec3((highResHeightmap.getWidth() - 1) * 0.5, 820, (highResHeightmap.getHeight() - 1) * 0.5f + 300);
+	pointLight.position = glm::vec3((highResHeightmap.getWidth() - 1) * 0.5, 750, (highResHeightmap.getHeight() - 1) * 0.5f + 300);
 	pointLight.lightColor = glm::vec3(1, 0.1, 0.1);
 
 	heightmap.setUseTexture(false);
@@ -143,6 +143,7 @@ void ofApp::draw(){
 	terrainShader.setUniformMatrix4f("mvp", mvp);
 	terrainShader.setUniformMatrix3f("normalMatrix", model);
 	terrainShader.setUniformMatrix4f("modelView", camData.getView() * model);
+	terrainShader.setUniformMatrix4f("model", model);
 	terrainShader.setUniformTexture("tex", terrainTex.getTexture(), 0);
 	terrainShader.setUniformTexture("normalMap", terrainNrml.getTexture(), 1);
 	terrainShader.setUniformTexture("envMap", irradianceMap.getTexture(), 2);

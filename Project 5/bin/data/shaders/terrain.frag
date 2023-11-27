@@ -13,6 +13,7 @@ uniform samplerCube envMap;
 
 in mat3 TBN;
 in vec3 cameraSpacePos;
+in vec3 fragWorldPos;
 in vec2 fragUV;
 out vec4 outColor;
 
@@ -26,9 +27,13 @@ void main(){
 	vec3 directionalLight = nDotL * dirLightColor;
 
 	//PointLight
+	vec3 pointLightDi = fragWorldPos - pointLightPos;
+	float pointNDotL = max(0, dot(normal, normalize(pointLightDi)));
+	float falloff = 1.0 / length(pointLightDi);
+	vec3 pointLight = pointNDotL * pointLightColor;
 
 	vec3 envIrradiance = pow(texture(envMap, normal).rgb, vec3(2.2));
-	vec3 irradiance = envIrradiance + directionalLight; // How much light the surface recieves
+	vec3 irradiance = envIrradiance + directionalLight + pointLight; // How much light the surface recieves
 	
 	//Final color calculations	
 	vec3 textureColor = vec3(pow(texture(tex, fragUV), vec4(2.2)));	
