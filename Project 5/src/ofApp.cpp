@@ -45,7 +45,7 @@ void ofApp::setup(){
 	velocity = glm::vec3(0, 0, 0);
 	mainLight.direction = glm::vec3(1, -1, 1);
 	mainLight.lightColor = glm::vec3(1);
-	pointLight.position = glm::vec3((highResHeightmap.getWidth() - 1) * 0.5, 750, (highResHeightmap.getHeight() - 1) * 0.5f + 300);
+	pointLight.position = glm::vec3((highResHeightmap.getWidth() - 1) * 0.5f, 820, (highResHeightmap.getHeight() - 1) * 0.5f );
 	pointLight.lightColor = glm::vec3(1, 0.1, 0.1);
 
 	heightmap.setUseTexture(false);
@@ -114,10 +114,10 @@ void ofApp::draw(){
 	waterShader.begin();
 	waterShader.setUniformMatrix4f("modelView", camData.getView() * model);
 	waterShader.setUniformMatrix4f("mvp", mvp);
-	waterShader.setUniformMatrix3f("normalMatrix", model);
 	waterShader.setUniformMatrix4f("model", model);
+	waterShader.setUniformMatrix3f("normalMatrix", model);
 	waterShader.setUniform3f("dirLightDirection", mainLight.direction);
-	waterShader.setUniform3f("dirLightColor", mainLight.lightColor);
+	waterShader.setUniform3f("dirLightColor", mainLight.lightColor * 10);
 	waterShader.setUniform3f("pointLightPos", pointLight.position);
 	waterShader.setUniform3f("pointLightColor", pointLight.lightColor);
 	waterShader.setUniform3f("meshColor", WATER_COLOR);
@@ -134,16 +134,16 @@ void ofApp::draw(){
 	waterShader.end();
 
 	terrainShader.begin();
-	terrainShader.setUniform1f("fogStart", 500.0f);
-	terrainShader.setUniform1f("fogEnd", 5000.0f);
+	terrainShader.setUniformMatrix4f("mvp", mvp);
+	terrainShader.setUniformMatrix4f("modelView", camData.getView() * model);
+	terrainShader.setUniformMatrix4f("model", model);
+	terrainShader.setUniformMatrix3f("normalMatrix", model);
 	terrainShader.setUniform3f("dirLightDir", mainLight.direction);
 	terrainShader.setUniform3f("dirLightColor", mainLight.lightColor);
 	terrainShader.setUniform3f("pointLightPos", pointLight.position);
-	terrainShader.setUniform3f("pointLightColor", pointLight.lightColor);
-	terrainShader.setUniformMatrix4f("mvp", mvp);
-	terrainShader.setUniformMatrix3f("normalMatrix", model);
-	terrainShader.setUniformMatrix4f("modelView", camData.getView() * model);
-	terrainShader.setUniformMatrix4f("model", model);
+	terrainShader.setUniform3f("pointLightColor", pointLight.lightColor * 10);
+	terrainShader.setUniform1f("fogStart", 500.0f);
+	terrainShader.setUniform1f("fogEnd", 5000.0f);
 	terrainShader.setUniformTexture("tex", terrainTex.getTexture(), 0);
 	terrainShader.setUniformTexture("normalMap", terrainNrml.getTexture(), 1);
 	terrainShader.setUniformTexture("envMap", irradianceMap.getTexture(), 2);
@@ -162,12 +162,12 @@ void ofApp::draw(){
 	waterShader.begin();
 	waterShader.setUniformMatrix4f("modelView", camData.getView() * model);
 	waterShader.setUniformMatrix4f("mvp", mvp);
-	waterShader.setUniformMatrix3f("normalMatrix", model);
 	waterShader.setUniformMatrix4f("model", model);
+	waterShader.setUniformMatrix3f("normalMatrix", model);
 	waterShader.setUniform3f("dirLightDir", mainLight.direction);
 	waterShader.setUniform3f("dirLightColor", mainLight.lightColor);
 	waterShader.setUniform3f("pointLightPos", pointLight.position);
-	waterShader.setUniform3f("pointLightColor", pointLight.lightColor);
+	waterShader.setUniform3f("pointLightColor", pointLight.lightColor * 10);
 	waterShader.setUniform3f("meshColor", WATER_COLOR);
 	waterShader.setUniform3f("cameraPos", camera.position);
 	waterShader.setUniform3f("specularColor", SPECULAR_COLOR);

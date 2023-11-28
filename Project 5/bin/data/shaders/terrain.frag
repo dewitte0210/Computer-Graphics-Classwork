@@ -27,9 +27,10 @@ void main(){
 	vec3 directionalLight = nDotL * dirLightColor;
 
 	//PointLight
-	vec3 pointLightDi = fragWorldPos - pointLightPos;
-	float pointNDotL = max(0, dot(normal, normalize(pointLightDi)));
-	float falloff = 1.0 / length(pointLightDi);
+	vec3 toPointLight = fragWorldPos - pointLightPos;
+	vec3 pointLightDir = normalize(toPointLight);
+	float pointNDotL = max(0, dot(normal, normalize(pointLightDir)));
+	float falloff = 1.0 / dot(toPointLight,toPointLight);
 	vec3 pointLight = pointNDotL * pointLightColor;
 
 	vec3 envIrradiance = pow(texture(envMap, normal).rgb, vec3(2.2));
@@ -37,5 +38,5 @@ void main(){
 	
 	//Final color calculations	
 	vec3 textureColor = vec3(pow(texture(tex, fragUV), vec4(2.2)));	
-	outColor = vec4( pow(textureColor * vec3(irradiance), vec3(1.0/2.2)), 1.0 - alpha);
+	outColor = vec4( pow(textureColor * irradiance, vec3(1.0/2.2)), 1.0 - alpha);
 }
