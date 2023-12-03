@@ -3,6 +3,8 @@
 #include <limits>
 #include <memory>
 #include <cstdlib>
+#include "ofMain.h"
+
 using std::shared_ptr;
 using std::make_shared;
 using std::sqrt;
@@ -24,5 +26,35 @@ inline float randomFloat(float min, float max) {
 	return min + (max - min) * randomFloat();
 }
 
+//Functions that should be added to the vector class but are here since im using glm
+glm::vec3 randomVec() {
+	return glm::vec3(randomFloat(), randomFloat(), randomFloat());
+}
+
+glm::vec3 randomVec(float min, float max) {
+	return glm::vec3(randomFloat(min, max), randomFloat(min, max), randomFloat(min, max));
+}
+
+inline glm::vec3 randomInUnitSphere() {
+	while (true) {
+		glm::vec3 p = randomVec(-1, 1);
+		if (glm::dot(p, p) < 1) {
+			return p;
+		}
+	}
+}
+inline glm::vec3 randomUnitVector() {
+	return glm::normalize(randomInUnitSphere());
+}
+inline glm::vec3 randomOnHemisphere(const glm::vec3& normal) {
+	glm::vec3 onUnitSphere = randomUnitVector();
+	if (glm::dot(onUnitSphere, normal) > 0.0) {
+		return onUnitSphere;
+	}
+	else {
+		return -onUnitSphere;
+	}
+	
+}
 #include "ray.h"
 #include "interval.h"

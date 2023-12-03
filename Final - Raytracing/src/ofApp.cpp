@@ -4,14 +4,15 @@
 #include "hittableList.h"
 #include "sphere.h"
 
-//Left off at 9. Diffuse Materials
 
-glm::vec3 rayColor(ray& r, const Hittable& world) {
+glm::vec3 rayColor(ray& r, const Hittable& world, int depth) {
+	if (depth <= 0) { return glm::vec3(0, 0, 0); }
 	glm::vec3 color;
 	HitRecord rec;
 
-	if (world.hit(r,Interval(0, infinity), rec)) {
-		color = 0.5 * (rec.normal + glm::vec3(1, 1, 1));
+	if (world.hit(r,Interval(0.001, infinity), rec)) {
+		glm::vec3 direction = rec.normal + randomOnHemisphere(rec.normal);
+		color = 0.5 * rayColor(ray(rec.hitPoint, direction), world,depth-1);
 	} else {
 		glm::vec3 unitDirection{ glm::normalize(r.getDirection()) };
 		float a = 0.5 * (unitDirection.y + 1.0);
@@ -28,12 +29,18 @@ ray ofApp::getRay(int x, int y) {
 	return ray(cameraCenter, rayDirection);
 }
 
-ofColor getFinalColor(glm::vec3 pixel,int samples) {
+ofColor ofApp::getFinalColor(glm::vec3 pixel,int samples) {
 	float r = pixel.r;
 	float g = pixel.g;
 	float b = pixel.b;
 	float scale = 1.0 / samples;
 	r *= scale; g *= scale; b *= scale;
+	
+	//Gamma correct the color.
+	r = glm::pow(r, 1.0 / 2.2);
+	g = glm::pow(g, 1.0 / 2.2);
+	b = glm::pow(b, 1.0 / 2.2);
+
 	ofColor finalColor;
 	Interval intensity{ 0.000, 0.999 };
 	finalColor.r = static_cast<int>(256 * intensity.clamp(r));
@@ -89,7 +96,7 @@ void ofApp::draw(){
 			glm::vec3 pixelColor{ 0,0,0 };
 			for (int sample = 0; sample < samplesPerPixel; sample++) {
 				ray r = getRay(x, y);
-				pixelColor += rayColor(r, world);
+				pixelColor += rayColor(r, world, maxDepth);
 			}
 			frameBuffer.setColor(frameBuffer.getPixelIndex(x, y), getFinalColor(pixelColor, samplesPerPixel));
 		}

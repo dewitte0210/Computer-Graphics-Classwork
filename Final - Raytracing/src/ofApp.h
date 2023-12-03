@@ -22,6 +22,7 @@ class ofApp : public ofBaseApp{
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
 		ray getRay(int x, int y);
+		ofColor getFinalColor(glm::vec3 pixel, int samples);
 private:
 	ofImage display;
 	ofPixels frameBuffer;
@@ -30,6 +31,8 @@ private:
 	int imageWidth{ 640 };
 	float aspectRatio;
 	int samplesPerPixel{ 10 };
+	int maxDepth{ 10 }; //Maximum number of ray bounces into the scene
+
 	//Camera Specific Variables
 	glm::vec3 cameraCenter;
 	glm::vec3 pixel00Loc;
