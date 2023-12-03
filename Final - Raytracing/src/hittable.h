@@ -1,11 +1,13 @@
 #pragma once
 #include "ofMain.h"
 #include "mathFunctions.h"
+#include "materials.h"
 
 class HitRecord {
 public:
 	glm::vec3 hitPoint;
 	glm::vec3 normal;
+	shared_ptr<Material> mat;
 	float t;
 	bool frontFace;
 

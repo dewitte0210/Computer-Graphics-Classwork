@@ -35,6 +35,14 @@ glm::vec3 randomVec(float min, float max) {
 	return glm::vec3(randomFloat(min, max), randomFloat(min, max), randomFloat(min, max));
 }
 
+glm::vec3 reflect(const glm::vec3& ray, const glm::vec3& normal) {
+	return ray - 2 * glm::dot(ray, normal) * normal;
+}
+
+bool nearZero(glm::vec3 vec) {
+	auto s = 1e-8;
+	return (fabs(vec.x) < s) && (fabs(vec.y) < s) && (fabs(vec.z) < s);
+}
 inline glm::vec3 randomInUnitSphere() {
 	while (true) {
 		glm::vec3 p = randomVec(-1, 1);
@@ -54,7 +62,7 @@ inline glm::vec3 randomOnHemisphere(const glm::vec3& normal) {
 	else {
 		return -onUnitSphere;
 	}
-	
 }
+
 #include "ray.h"
 #include "interval.h"

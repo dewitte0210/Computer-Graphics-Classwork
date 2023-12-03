@@ -11,8 +11,12 @@ glm::vec3 rayColor(ray& r, const Hittable& world, int depth) {
 	HitRecord rec;
 
 	if (world.hit(r,Interval(0.001, infinity), rec)) {
-		glm::vec3 direction = rec.normal + randomOnHemisphere(rec.normal);
-		color = 0.5 * rayColor(ray(rec.hitPoint, direction), world,depth-1);
+		ray scattered;
+		glm::vec3 attenuation;
+		if (rec.mat->scatter(r, rec, attenuation, scattered)) {
+			return attenuation & rayColor(scattered, world, depth - 1);
+		}
+		return glm::vec3(0, 0, 0);
 	} else {
 		glm::vec3 unitDirection{ glm::normalize(r.getDirection()) };
 		float a = 0.5 * (unitDirection.y + 1.0);
@@ -74,10 +78,16 @@ void ofApp::setup(){
 	vec3 viewportUpperLeft = cameraCenter - vec3(0, 0, focalLength) - viewportU / 2 - viewportV / 2;
 	pixel00Loc = viewportUpperLeft + 0.5 * (pixelDeltaU + pixelDeltaV);
 
-	//add objects into our world
-	world.add(make_shared<Sphere>(glm::vec3(0, 0, -1), 0.5));
-	world.add(make_shared<Sphere>(glm::vec3(0, -100.5, -1), 100));
+	//Add objects to the world
+	auto materialGround{ make_shared<Lambertian>(glm::vec3(0.8,0.8,0.0)) };
+	auto materialCenter{ make_shared<Lambertian>(glm::vec3(0.7,0.3,0.3)) };
+	auto materialLeft{ make_shared<Mirror>(glm::vec3(0.8,0.8,0.8)) };
+	auto materialRight{ make_shared<Mirror>(glm::vec3(0.8,0.6,0.2)) };
 
+	world.add(make_shared<Sphere>(glm::vec3(0.0, -100.5, -1.0), 100.0, materialGround));
+	world.add(make_shared<Sphere>(glm::vec3(0.0, 0.0, -1.0), 0.5, materialCenter));
+	world.add(make_shared<Sphere>(glm::vec3(-1.0, 0.0, -1.0), 0.5, materialLeft));
+	world.add(make_shared<Sphere>(glm::vec3(1.0, 0.0, -1.0), 0.5, materialRight));
 	frameBuffer.allocate(imageWidth, imageHeight, OF_IMAGE_COLOR);
 }
 
