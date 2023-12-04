@@ -1,6 +1,5 @@
 #pragma once
 #include "hittable.h"
-#include "ofMain.h"
 
 class Sphere : public Hittable {
 public :

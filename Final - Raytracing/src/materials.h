@@ -1,4 +1,5 @@
 #pragma once
+#include "mathFunctions.h"
 #include "hittable.h"
 
 class Material {

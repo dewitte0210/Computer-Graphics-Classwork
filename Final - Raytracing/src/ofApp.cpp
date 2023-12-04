@@ -1,9 +1,9 @@
 #include "ofApp.h"
 #include "mathFunctions.h"
 #include "hittable.h"
+#include "materials.h"
 #include "hittableList.h"
 #include "sphere.h"
-
 
 glm::vec3 rayColor(ray& r, const Hittable& world, int depth) {
 	if (depth <= 0) { return glm::vec3(0, 0, 0); }

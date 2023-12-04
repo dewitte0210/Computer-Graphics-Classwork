@@ -1,8 +1,7 @@
 #pragma once
-#include "ofMain.h"
 #include "mathFunctions.h"
-#include "materials.h"
 
+class Material;
 class HitRecord {
 public:
 	glm::vec3 hitPoint;
