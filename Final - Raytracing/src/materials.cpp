@@ -5,7 +5,7 @@
 // Lambertian Material
 Lambertian::Lambertian(const glm::vec3& color) : albedo(color) {}
 
-bool Lambertian::scatter(const ray& rIn, const HitRecord& rec, glm::vec3& attenuation, ray& scattered) const {
+bool Lambertian::scatter(const ray& rIn, HitRecord& rec, glm::vec3& attenuation, ray& scattered) const {
 	glm::vec3 scatterDirection = rec.normal + randomUnitVector();
 	
 	//Catches a bad reflection case
@@ -20,7 +20,7 @@ bool Lambertian::scatter(const ray& rIn, const HitRecord& rec, glm::vec3& attenu
 //Mirror Material
 
 Mirror::Mirror(const glm::vec3& color) : albedo(color) {}
-bool Mirror::scatter(const ray& rIn, const HitRecord& rec, glm::vec3& attenuation, ray& scattered) const {
+bool Mirror::scatter(const ray& rIn, HitRecord& rec, glm::vec3& attenuation, ray& scattered) const {
 	glm::vec3 reflected = reflect(glm::normalize(rIn.getDirection()), rec.normal);
 	scattered = ray(rec.hitPoint, reflected);
 	attenuation = albedo;
