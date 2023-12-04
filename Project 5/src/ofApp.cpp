@@ -119,14 +119,14 @@ void ofApp::draw(){
 	waterShader.setUniform3f("dirLightDirection", mainLight.direction);
 	waterShader.setUniform3f("dirLightColor", mainLight.lightColor);
 	waterShader.setUniform3f("pointLightPos", pointLight.position);
-	waterShader.setUniform3f("pointLightColor", pointLight.lightColor * 5);
+	waterShader.setUniform3f("pointLightColor", pointLight.lightColor);
 	waterShader.setUniform3f("meshColor", WATER_COLOR);
 	waterShader.setUniform3f("camerPos", camera.position);
 	waterShader.setUniform3f("specularColor", SPECULAR_COLOR);
 	waterShader.setUniform1f("fogStart", 500.0f);
 	waterShader.setUniform1f("fogEnd", 5000.0f);
 	waterShader.setUniform1f("time", t);	
-	waterShader.setUniform1f("m", 0.02);
+	waterShader.setUniform1f("m", 0.1);
 	waterShader.setUniformTexture("normalMap", waterNrml.getTexture(), 0);
 	waterShader.setUniformTexture("envMap", irradianceMap.getTexture(), 1);
 	waterShader.setUniformTexture("reflectMap", cubeMap.getTexture(), 2);
@@ -174,7 +174,7 @@ void ofApp::draw(){
 	waterShader.setUniform1f("fogStart", 400.0f);
 	waterShader.setUniform1f("fogEnd", 500.0f);
 	waterShader.setUniform1f("time", t);
-	waterShader.setUniform1f("m", 0.02);
+	waterShader.setUniform1f("m", 0.1);
 	waterShader.setUniformTexture("normalMap", waterNrml.getTexture(), 0);
 	waterShader.setUniformTexture("envMap", irradianceMap.getTexture(), 1);
 	waterShader.setUniformTexture("reflectMap", cubeMap.getTexture(), 2);
