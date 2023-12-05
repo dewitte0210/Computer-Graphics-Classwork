@@ -28,15 +28,20 @@ private:
 	ofPixels frameBuffer;
 
 	int imageHeight;
-	int imageWidth{ 640 };
-	float aspectRatio;
+	int imageWidth{ 1200 };
+	float aspectRatio{ 16.0 / 9.0 };
 	int samplesPerPixel{ 10 };
-	int maxDepth{ 10 }; //Maximum number of ray bounces into the scene
+	int maxDepth{ 50 }; //Maximum number of ray bounces into the scene
 
 	//Camera Specific Variables
 	glm::vec3 cameraCenter;
 	glm::vec3 pixel00Loc;
 	glm::vec3 pixelDeltaU;
 	glm::vec3 pixelDeltaV;
+	glm::vec3 lookFrom{ 13,2,3 };
+	glm::vec3 lookAt{ 0,0,0 };
+	glm::vec3 vUp{ 0,1,0 };
+	glm::vec3 u, v, w;
+	float camFov{ 20.0 };
 	HittableList world;
 };

@@ -35,9 +35,6 @@ glm::vec3 randomVec(float min, float max) {
 	return glm::vec3(randomFloat(min, max), randomFloat(min, max), randomFloat(min, max));
 }
 
-glm::vec3 reflect(const glm::vec3& ray, const glm::vec3& normal) {
-	return ray - 2 * glm::dot(ray, normal) * normal;
-}
 
 bool nearZero(glm::vec3 vec) {
 	auto s = 1e-8;
@@ -63,6 +60,14 @@ inline glm::vec3 randomOnHemisphere(const glm::vec3& normal) {
 		return -onUnitSphere;
 	}
 }
-
+inline glm::vec3 reflect(const glm::vec3& ray, const glm::vec3& normal) {
+	return ray - 2 * glm::dot(ray, normal) * normal;
+}
+inline glm::vec3 refract(const glm::vec3& uv, const glm::vec3& n, float etaiOverEtat) {
+	float cosTheta{ fmin(glm::dot(-uv,n), 1.0f) };
+	glm::vec3 perpendicularR = etaiOverEtat * (uv + cosTheta * n);
+	glm::vec3 parallelR = -sqrt(fabs(1.0 - glm::dot(perpendicularR, perpendicularR))) * n;
+	return perpendicularR + parallelR;
+}
 #include "ray.h"
 #include "interval.h"
