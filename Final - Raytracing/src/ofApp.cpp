@@ -4,6 +4,9 @@
 #include "materials.h"
 #include "hittableList.h"
 #include "sphere.h"
+#include <thread>
+#include <future>
+#include <vector>
 
 glm::vec3 rayColor(ray& r, const Hittable& world, int depth) {
 	if (depth <= 0) { return glm::vec3(0, 0, 0); }
@@ -83,6 +86,19 @@ void ofApp::setup(){
 	vec3 viewportUpperLeft = cameraCenter - (focalLength * w) - viewportU/2 - viewportV/2;
 	pixel00Loc = viewportUpperLeft + 0.5 * (pixelDeltaU + pixelDeltaV);
 
+	//Three materials Test Image
+	auto groundMaterial = make_shared<Lambertian>(glm::vec3(0.8, 0.8, 0.0));
+	auto centerMaterial = make_shared<Lambertian>(glm::vec3(0.7, 0.3, 0.3));
+	auto leftMaterial = make_shared<Mirror>(glm::vec3(0.8, 0.8, 0.8), 0.0);
+	auto rightMaterial = make_shared<Mirror>(glm::vec3(0.8, 0.6, 0.2),1.0);
+
+	world.add(make_shared<Sphere>(glm::vec3(0.0, -100.5, -1.0), 100.0, groundMaterial));
+	world.add(make_shared<Sphere>(glm::vec3(0.0, 0.0, -1.0), 0.5, centerMaterial));
+	world.add(make_shared<Sphere>(glm::vec3(-1.0, 0.0, -1.0), 0.5, leftMaterial));
+	world.add(make_shared<Sphere>(glm::vec3(1.0, 0.0, -1.0), 0.5, rightMaterial));
+	
+	
+	/* Random Balls Image
 	//Add objects to the world
 	auto groundMaterial = make_shared<Lambertian>(glm::vec3(0.5, 0.5, 0.5));
 	world.add(make_shared<Sphere>(glm::vec3(0, -1000, 0), 1000, groundMaterial));
@@ -121,6 +137,7 @@ void ofApp::setup(){
 
 	auto mirrorMat = make_shared<Mirror>(vec3(0.7, 0.5, 0.5), 0.0);
 	world.add(make_shared<Sphere>(vec3(4, 1, 0), 1.0, mirrorMat));
+	*/
 	frameBuffer.allocate(imageWidth, imageHeight, OF_IMAGE_COLOR);
 }
 
@@ -129,10 +146,23 @@ void ofApp::update(){
 
 }
 
+void threadedRayColor(ray& r,const Hittable& world, int depth, std::promise<glm::vec3> & prms) {
+	prms.set_value(rayColor(r, world, depth));
+}
+
+void ofApp::calcPixel(int x, int y, int samples, std::promise<glm::vec3> & prms) {
+	glm::vec3 pixelColor{ 0,0,0 };
+	for (int i = 0; i < samples; i++) {
+		ray r = getRay(x, y);
+		pixelColor += rayColor(r, world, maxDepth);
+	}
+	prms.set_value(pixelColor);
+}
 //--------------------------------------------------------------
 void ofApp::draw(){
 	using namespace glm;
-	
+// Original single thread implementation
+	/*
 	for (int y = 0; y < imageHeight; y++) {
 		std::clog << "\rScanlines remaining: " << (imageHeight- y) << ' ' << std::flush;
 		for (int x = 0; x < imageWidth; x++) {
@@ -142,6 +172,24 @@ void ofApp::draw(){
 				pixelColor += rayColor(r, world, maxDepth);
 			}
 			frameBuffer.setColor(frameBuffer.getPixelIndex(x, y), getFinalColor(pixelColor, samplesPerPixel));
+		}
+	}
+*/
+// Multi threaded implementation
+	for (int y = 0; y < imageHeight; y++) {
+		std::clog << "\r Scanlines remaining: " << (imageHeight - y) << ' ' << std::flush;
+		std::vector<std::thread> threads;
+		std::vector<std::future<glm::vec3>> futures;
+		for (int x = 0; x < imageWidth; x++) {
+			std::promise<glm::vec3> prms;
+			std::future<glm::vec3> ftr = prms.get_future();
+			threads.push_back(std::thread(&ofApp::calcPixel, x, y, samplesPerPixel, std::move(prms)));
+			futures.push_back(std::move(ftr));
+		}
+		int count = 0;
+		for (auto& th : threads) {
+			frameBuffer.setColor(frameBuffer.getPixelIndex(count, y), getFinalColor(futures.at(count).get(), samplesPerPixel));
+			th.join();
 		}
 	}
 	std::clog << "\rDone.                 \n";
