@@ -8,6 +8,9 @@
 #include <future>
 #include <vector>
 
+
+/* Paper for Denoising
+https://vciba.springeropen.com/articles/10.1186/s42492-019-0016-7 */
 glm::vec3 rayColor(ray& r, const Hittable& world, int depth) {
 	if (depth <= 0) { return glm::vec3(0, 0, 0); }
 	glm::vec3 color{ 0,0,0 };
@@ -162,7 +165,6 @@ void ofApp::calcPixel(int x, int y, int samples, std::promise<glm::vec3> & prms)
 void ofApp::draw(){
 	using namespace glm;
 // Original single thread implementation
-	/*
 	for (int y = 0; y < imageHeight; y++) {
 		std::clog << "\rScanlines remaining: " << (imageHeight- y) << ' ' << std::flush;
 		for (int x = 0; x < imageWidth; x++) {
@@ -174,8 +176,8 @@ void ofApp::draw(){
 			frameBuffer.setColor(frameBuffer.getPixelIndex(x, y), getFinalColor(pixelColor, samplesPerPixel));
 		}
 	}
-*/
 // Multi threaded implementation
+	/*
 	for (int y = 0; y < imageHeight; y++) {
 		std::clog << "\r Scanlines remaining: " << (imageHeight - y) << ' ' << std::flush;
 		std::vector<std::thread> threads;
@@ -192,6 +194,7 @@ void ofApp::draw(){
 			th.join();
 		}
 	}
+	*/
 	std::clog << "\rDone.                 \n";
 	display.setFromPixels(frameBuffer);
 	display.draw(0,0);

@@ -32,7 +32,7 @@ private:
 	int imageHeight;
 	int imageWidth{ 1200 };
 	float aspectRatio{ 16.0 / 9.0 };
-	int samplesPerPixel{ 10 };
+	int samplesPerPixel{ 50 };
 	int maxDepth{ 10 }; //Maximum number of ray bounces into the scene
 
 	//Camera Specific Variables
