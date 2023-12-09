@@ -10,8 +10,10 @@
 
 
 /* Paper for Denoising
-https://vciba.springeropen.com/articles/10.1186/s42492-019-0016-7 */
-glm::vec3 rayColor(ray& r, const Hittable& world, int depth) {
+https://www.darktable.org/2011/11/darktable-and-research/hdl11_paper.pdf
+https://www.youtube.com/watch?v=_NwJd0pg4Fo
+*/
+glm::vec3 ofApp::rayColor(ray& r, const Hittable& world, int depth) {
 	if (depth <= 0) { return glm::vec3(0, 0, 0); }
 	glm::vec3 color{ 0,0,0 };
 	HitRecord rec;
@@ -148,23 +150,9 @@ void ofApp::setup(){
 void ofApp::update(){
 
 }
-
-void threadedRayColor(ray& r,const Hittable& world, int depth, std::promise<glm::vec3> & prms) {
-	prms.set_value(rayColor(r, world, depth));
-}
-
-void ofApp::calcPixel(int x, int y, int samples, std::promise<glm::vec3> & prms) {
-	glm::vec3 pixelColor{ 0,0,0 };
-	for (int i = 0; i < samples; i++) {
-		ray r = getRay(x, y);
-		pixelColor += rayColor(r, world, maxDepth);
-	}
-	prms.set_value(pixelColor);
-}
 //--------------------------------------------------------------
 void ofApp::draw(){
 	using namespace glm;
-// Original single thread implementation
 	for (int y = 0; y < imageHeight; y++) {
 		std::clog << "\rScanlines remaining: " << (imageHeight- y) << ' ' << std::flush;
 		for (int x = 0; x < imageWidth; x++) {
@@ -176,25 +164,6 @@ void ofApp::draw(){
 			frameBuffer.setColor(frameBuffer.getPixelIndex(x, y), getFinalColor(pixelColor, samplesPerPixel));
 		}
 	}
-// Multi threaded implementation
-	/*
-	for (int y = 0; y < imageHeight; y++) {
-		std::clog << "\r Scanlines remaining: " << (imageHeight - y) << ' ' << std::flush;
-		std::vector<std::thread> threads;
-		std::vector<std::future<glm::vec3>> futures;
-		for (int x = 0; x < imageWidth; x++) {
-			std::promise<glm::vec3> prms;
-			std::future<glm::vec3> ftr = prms.get_future();
-			threads.push_back(std::thread(&ofApp::calcPixel, x, y, samplesPerPixel, std::move(prms)));
-			futures.push_back(std::move(ftr));
-		}
-		int count = 0;
-		for (auto& th : threads) {
-			frameBuffer.setColor(frameBuffer.getPixelIndex(count, y), getFinalColor(futures.at(count).get(), samplesPerPixel));
-			th.join();
-		}
-	}
-	*/
 	std::clog << "\rDone.                 \n";
 	display.setFromPixels(frameBuffer);
 	display.draw(0,0);
