@@ -13,16 +13,20 @@
 https://www.darktable.org/2011/11/darktable-and-research/hdl11_paper.pdf
 https://www.youtube.com/watch?v=_NwJd0pg4Fo
 */
-glm::vec3 ofApp::rayColor(ray& r, const Hittable& world, int depth) {
+glm::vec3 ofApp::rayColor(ray& r, const Hittable& world, int depth, glm::vec3& firstNorm, glm::vec3& firstPos) {
 	if (depth <= 0) { return glm::vec3(0, 0, 0); }
 	glm::vec3 color{ 0,0,0 };
 	HitRecord rec;
 
 	if (world.hit(r,Interval(0.001, infinity), rec)) {
+		if (depth == maxDepth) {
+			firstNorm = rec.normal;
+			firstPos = rec.hitPoint;
+		}
 		ray scattered;
 		glm::vec3 attenuation;
 		if (rec.mat->scatter(r, rec, attenuation, scattered)) {
-			return attenuation * rayColor(scattered, world, depth - 1);
+			return attenuation * rayColor(scattered, world, depth - 1, firstNorm, firstPos);
 		}
 	} else {
 		glm::vec3 unitDirection{ glm::normalize(r.getDirection()) };
@@ -144,6 +148,8 @@ void ofApp::setup(){
 	world.add(make_shared<Sphere>(vec3(4, 1, 0), 1.0, mirrorMat));
 	*/
 	frameBuffer.allocate(imageWidth, imageHeight, OF_IMAGE_COLOR);
+	normalBuffer.allocate(imageWidth, imageHeight, OF_IMAGE_COLOR);
+	positionalBuffer.allocate(imageWidth, imageHeight, OF_IMAGE_COLOR);
 }
 
 //--------------------------------------------------------------
@@ -157,14 +163,20 @@ void ofApp::draw(){
 		std::clog << "\rScanlines remaining: " << (imageHeight- y) << ' ' << std::flush;
 		for (int x = 0; x < imageWidth; x++) {
 			glm::vec3 pixelColor{ 0,0,0 };
+			glm::vec3 firstBounceNormal;
+			glm::vec3 firstBouncePos;
 			for (int sample = 0; sample < samplesPerPixel; sample++) {
 				ray r = getRay(x, y);
-				pixelColor += rayColor(r, world, maxDepth);
+				pixelColor += rayColor(r, world, maxDepth, firstBounceNormal, firstBouncePos);
 			}
 			frameBuffer.setColor(frameBuffer.getPixelIndex(x, y), getFinalColor(pixelColor, samplesPerPixel));
+			normalBuffer.setColor(normalBuffer.getPixelIndex(x, y), getFinalColor(firstBounceNormal, 1));
+			positionalBuffer.setColor(positionalBuffer.getPixelIndex(x, y), getFinalColor(firstBouncePos, 1));
 		}
 	}
 	std::clog << "\rDone.                 \n";
+	std::clog << "starting denoising" << std::endl;
+	frameBuffer = denoiser.denoise(frameBuffer, normalBuffer, positionalBuffer);
 	display.setFromPixels(frameBuffer);
 	display.draw(0,0);
 }

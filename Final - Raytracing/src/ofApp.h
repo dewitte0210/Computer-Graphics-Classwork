@@ -3,6 +3,7 @@
 #include "ofMain.h"
 #include "hittablelist.h"
 #include "mathFunctions.h"
+#include "denoiser.h"
 #include <future>
 class ofApp : public ofBaseApp{
 
@@ -25,14 +26,18 @@ class ofApp : public ofBaseApp{
 		ray getRay(int x, int y);
 		void calcPixel(int x, int y, int samples, std::promise<glm::vec3> & prms);
 		ofColor getFinalColor(glm::vec3 pixel, int samples);
+		glm::vec3 rayColor(ray& r, const Hittable& world, int depth, glm::vec3& firstNorm, glm::vec3& firstPos);
+
 private:
 	ofImage display;
 	ofPixels frameBuffer;
-
+	ofPixels normalBuffer;
+	ofPixels positionalBuffer;
+	Denoiser denoiser;
 	int imageHeight;
-	int imageWidth{ 1200 };
+	int imageWidth{ 640 };
 	float aspectRatio{ 16.0 / 9.0 };
-	int samplesPerPixel{ 2};
+	int samplesPerPixel{1};
 	int maxDepth{ 10 }; //Maximum number of ray bounces into the scene
 
 	//Camera Specific Variables
