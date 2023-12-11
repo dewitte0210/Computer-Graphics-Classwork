@@ -10,7 +10,7 @@ public:
 private:
 	int width;
 	int height;
-	float rtSIG{ 0.850};
+	float rtSIG{ 0.950};
 	float nSIG{ 0.300};
 	float pSIG{ 0.250};
 

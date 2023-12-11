@@ -157,8 +157,8 @@ void ofApp::draw(){
 	}
 	std::clog << "\rDone.                 \n";
 	std::clog << "starting denoising" << std::endl;
-	frameBuffer = denoiser.denoise(frameBuffer, normalBuffer, positionalBuffer);
-	display.setFromPixels(frameBuffer);
+	//frameBuffer = denoiser.denoise(frameBuffer, normalBuffer, positionalBuffer);
+	display.setFromPixels(positionalBuffer);
 	display.draw(0,0);
 }
 
