@@ -1,6 +1,6 @@
 #include "interval.h"
 
-Interval::Interval() : min(+infinity), max(-infinity) {}
+//Interval::Interval() : min(+infinity), max(-infinity) {}
 Interval::Interval(float min, float max) : min(min), max(max) {}
 
 bool Interval::conatins(float x) const {

@@ -44,25 +44,6 @@ ray ofApp::getRay(int x, int y) {
 	return ray(cameraCenter, rayDirection);
 }
 
-ofColor ofApp::getFinalColor(glm::vec3 pixel,int samples) {
-	float r = pixel.r;
-	float g = pixel.g;
-	float b = pixel.b;
-	float scale = 1.0 / samples;
-	r *= scale; g *= scale; b *= scale;
-	
-	//Gamma correct the color.
-	r = glm::pow(r, 1.0 / 2.2);
-	g = glm::pow(g, 1.0 / 2.2);
-	b = glm::pow(b, 1.0 / 2.2);
-
-	ofColor finalColor;
-	Interval intensity{ 0.000, 0.999 };
-	finalColor.r = static_cast<int>(256 * intensity.clamp(r));
-	finalColor.g = static_cast<int>(256 * intensity.clamp(g));
-	finalColor.b = static_cast<int>(256 * intensity.clamp(b));
-	return finalColor;
-}
 //--------------------------------------------------------------
 void ofApp::setup(){
 	using namespace glm;
@@ -183,7 +164,6 @@ void ofApp::draw(){
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
-
 }
 
 //--------------------------------------------------------------

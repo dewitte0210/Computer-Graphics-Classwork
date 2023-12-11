@@ -25,7 +25,6 @@ class ofApp : public ofBaseApp{
 		void gotMessage(ofMessage msg);
 		ray getRay(int x, int y);
 		void calcPixel(int x, int y, int samples, std::promise<glm::vec3> & prms);
-		ofColor getFinalColor(glm::vec3 pixel, int samples);
 		glm::vec3 rayColor(ray& r, const Hittable& world, int depth, glm::vec3& firstNorm, glm::vec3& firstPos);
 
 private:

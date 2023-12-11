@@ -69,5 +69,26 @@ inline glm::vec3 refract(const glm::vec3& uv, const glm::vec3& n, float etaiOver
 	glm::vec3 parallelR = -sqrt(fabs(1.0 - glm::dot(perpendicularR, perpendicularR))) * n;
 	return perpendicularR + parallelR;
 }
+
 #include "ray.h"
 #include "interval.h"
+ofColor getFinalColor(glm::vec3 pixel,int samples) {
+	float r = pixel.r;
+	float g = pixel.g;
+	float b = pixel.b;
+	float scale = 1.0 / samples;
+	r *= scale; g *= scale; b *= scale;
+	
+	//Gamma correct the color.
+	r = glm::pow(r, 1.0 / 2.2);
+	g = glm::pow(g, 1.0 / 2.2);
+	b = glm::pow(b, 1.0 / 2.2);
+
+	ofColor finalColor;
+	Interval intensity{ 0.000, 0.999 };
+	finalColor.r = static_cast<int>(256 * intensity.clamp(r));
+	finalColor.g = static_cast<int>(256 * intensity.clamp(g));
+	finalColor.b = static_cast<int>(256 * intensity.clamp(b));
+	return finalColor;
+}
+
