@@ -31,7 +31,7 @@ glm::vec3 ofApp::rayColor(ray& r, const Hittable& world, int depth, glm::vec3& f
 	} else {
 		glm::vec3 unitDirection{ glm::normalize(r.getDirection()) };
 		float a = 0.5 * (unitDirection.y + 1.0);
-		color = glm::vec3((1.0 - a) * glm::vec3(1.0,1.0,1.0) + a * glm::vec3(0.5,0.7,1.0));
+		color = glm::vec3((1.0 - a) * glm::vec3(0.7,1.0,0.7) + a * glm::vec3(0.5,0.7,1.0));
 	}
 
 	return color;
@@ -77,6 +77,7 @@ void ofApp::setup(){
 	pixel00Loc = viewportUpperLeft + 0.5 * (pixelDeltaU + pixelDeltaV);
 
 	//Three materials Test Image
+/*
 	auto groundMaterial = make_shared<Lambertian>(glm::vec3(0.8, 0.8, 0.0));
 	auto centerMaterial = make_shared<Lambertian>(glm::vec3(0.7, 0.3, 0.3));
 	auto leftMaterial = make_shared<Mirror>(glm::vec3(0.8, 0.8, 0.8), 0.0);
@@ -86,9 +87,9 @@ void ofApp::setup(){
 	world.add(make_shared<Sphere>(glm::vec3(0.0, 0.0, -1.0), 0.5, centerMaterial));
 	world.add(make_shared<Sphere>(glm::vec3(-1.0, 0.0, -1.0), 0.5, leftMaterial));
 	world.add(make_shared<Sphere>(glm::vec3(1.0, 0.0, -1.0), 0.5, rightMaterial));
+*/	
 	
-	
-	/* Random Balls Image
+	// Random Balls Image
 	//Add objects to the world
 	auto groundMaterial = make_shared<Lambertian>(glm::vec3(0.5, 0.5, 0.5));
 	world.add(make_shared<Sphere>(glm::vec3(0, -1000, 0), 1000, groundMaterial));
@@ -127,7 +128,7 @@ void ofApp::setup(){
 
 	auto mirrorMat = make_shared<Mirror>(vec3(0.7, 0.5, 0.5), 0.0);
 	world.add(make_shared<Sphere>(vec3(4, 1, 0), 1.0, mirrorMat));
-	*/
+	
 	frameBuffer.allocate(imageWidth, imageHeight, OF_IMAGE_COLOR);
 	normalBuffer.allocate(imageWidth, imageHeight, OF_IMAGE_COLOR);
 	positionalBuffer.allocate(imageWidth, imageHeight, OF_IMAGE_COLOR);
@@ -157,8 +158,8 @@ void ofApp::draw(){
 	}
 	std::clog << "\rDone.                 \n";
 	std::clog << "starting denoising" << std::endl;
-	//frameBuffer = denoiser.denoise(frameBuffer, normalBuffer, positionalBuffer);
-	display.setFromPixels(positionalBuffer);
+	frameBuffer = denoiser.denoise(frameBuffer, normalBuffer, positionalBuffer);
+	display.setFromPixels(frameBuffer);
 	display.draw(0,0);
 }
 

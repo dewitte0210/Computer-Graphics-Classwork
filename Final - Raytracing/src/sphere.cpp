@@ -13,7 +13,7 @@ bool Sphere::hit(ray& r, Interval rayT, HitRecord& rec)const {
 		return false;
 	}
 	float sqrtd = sqrt(discriminant);
-
+	
 	// Find the neareset root that lies in the acceptable range
 	float root = (-bHalf - sqrtd) / a;
 	if (!rayT.surrounds(root)) {

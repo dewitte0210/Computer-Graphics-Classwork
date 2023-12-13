@@ -44,12 +44,12 @@ private:
 	glm::vec3 pixel00Loc;
 	glm::vec3 pixelDeltaU;
 	glm::vec3 pixelDeltaV;
-//	glm::vec3 lookFrom{ 13,2,3 };
-	glm::vec3 lookFrom{ 0,0,0.5 };
+	glm::vec3 lookFrom{ 13,2,3 };
+//	glm::vec3 lookFrom{ 0,0,0.5 };
 	glm::vec3 lookAt{ 0,0,0 };
 	glm::vec3 vUp{ 0,1,0 };
 	glm::vec3 u, v, w;
-	float camFov{ 90.0 };
-	// float camFov{20.0};
+//	float camFov{ 90.0 };
+	 float camFov{20.0};
 	HittableList world;
 };
