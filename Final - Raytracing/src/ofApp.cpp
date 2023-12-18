@@ -7,6 +7,7 @@
 #include <thread>
 #include <future>
 #include <vector>
+#include <chrono>
 
 
 /* Paper for Denoising
@@ -75,9 +76,8 @@ void ofApp::setup(){
 	//Calculate the location of the upper left pixel.
 	vec3 viewportUpperLeft = cameraCenter - (focalLength * w) - viewportU/2 - viewportV/2;
 	pixel00Loc = viewportUpperLeft + 0.5 * (pixelDeltaU + pixelDeltaV);
-
-	//Three materials Test Image
 /*
+	//Three materials Test Image
 	auto groundMaterial = make_shared<Lambertian>(glm::vec3(0.8, 0.8, 0.0));
 	auto centerMaterial = make_shared<Lambertian>(glm::vec3(0.7, 0.3, 0.3));
 	auto leftMaterial = make_shared<Mirror>(glm::vec3(0.8, 0.8, 0.8), 0.0);
@@ -88,7 +88,6 @@ void ofApp::setup(){
 	world.add(make_shared<Sphere>(glm::vec3(-1.0, 0.0, -1.0), 0.5, leftMaterial));
 	world.add(make_shared<Sphere>(glm::vec3(1.0, 0.0, -1.0), 0.5, rightMaterial));
 */	
-	
 	// Random Balls Image
 	//Add objects to the world
 	auto groundMaterial = make_shared<Lambertian>(glm::vec3(0.5, 0.5, 0.5));
@@ -140,7 +139,9 @@ void ofApp::update(){
 }
 //--------------------------------------------------------------
 void ofApp::draw(){
+	std::chrono::time_point<std::chrono::system_clock> start, end;
 	using namespace glm;
+	start = std::chrono::system_clock::now();
 	for (int y = 0; y < imageHeight; y++) {
 		std::clog << "\rScanlines remaining: " << (imageHeight- y) << ' ' << std::flush;
 		for (int x = 0; x < imageWidth; x++) {
@@ -158,9 +159,12 @@ void ofApp::draw(){
 	}
 	std::clog << "\rDone.                 \n";
 	std::clog << "starting denoising" << std::endl;
-	frameBuffer = denoiser.denoise(frameBuffer, normalBuffer, positionalBuffer);
+//	frameBuffer = denoiser.denoise(frameBuffer, normalBuffer, positionalBuffer);
 	display.setFromPixels(frameBuffer);
 	display.draw(0,0);
+	end = std::chrono::system_clock::now();
+	std::chrono::duration<double> elapsedTime = end - start;
+	std::cout << "Frame took " << elapsedTime.count() << " seconds to render and denoise" << std::endl;
 }
 
 //--------------------------------------------------------------
