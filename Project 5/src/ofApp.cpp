@@ -44,9 +44,9 @@ void ofApp::setup(){
 
 	velocity = glm::vec3(0, 0, 0);
 	mainLight.direction = glm::vec3(1, -1, 1);
-	mainLight.lightColor = glm::vec3(1);
+	mainLight.lightColor = glm::vec3(0.6);
 	pointLight.position = glm::vec3((highResHeightmap.getWidth() - 1) * 0.5f, 820, (highResHeightmap.getHeight() - 1) * 0.5f );
-	pointLight.lightColor = glm::vec3(1, 0.1, 0.1);
+	pointLight.lightColor = glm::vec3(0.3);
 
 	heightmap.setUseTexture(false);
 	heightmap.load("textures/TamrielLowRes.png");
@@ -126,7 +126,7 @@ void ofApp::draw(){
 	waterShader.setUniform1f("fogStart", 500.0f);
 	waterShader.setUniform1f("fogEnd", 5000.0f);
 	waterShader.setUniform1f("time", t);	
-	waterShader.setUniform1f("m", 0.1);
+	waterShader.setUniform1f("m", 0.02);
 	waterShader.setUniformTexture("normalMap", waterNrml.getTexture(), 0);
 	waterShader.setUniformTexture("envMap", irradianceMap.getTexture(), 1);
 	waterShader.setUniformTexture("reflectMap", cubeMap.getTexture(), 2);
@@ -174,7 +174,7 @@ void ofApp::draw(){
 	waterShader.setUniform1f("fogStart", 400.0f);
 	waterShader.setUniform1f("fogEnd", 500.0f);
 	waterShader.setUniform1f("time", t);
-	waterShader.setUniform1f("m", 0.1);
+	waterShader.setUniform1f("m", 0.02);
 	waterShader.setUniformTexture("normalMap", waterNrml.getTexture(), 0);
 	waterShader.setUniformTexture("envMap", irradianceMap.getTexture(), 1);
 	waterShader.setUniformTexture("reflectMap", cubeMap.getTexture(), 2);
